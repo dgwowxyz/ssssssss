@@ -2995,22 +2995,42 @@ function Library:CreateWindow(...)
         ZIndex = 1;
         Parent = Inner;
     });
-    WindowLabel.RichText = true;
+    
+    local SuffixLabel = Library:CreateLabel({
+        Position = UDim2.new(0, 7, 0, 0);
+        Size = UDim2.new(0, 0, 0, 25);
+        Text = Config.Suffix or '';
+        TextXAlignment = Enum.TextXAlignment.Left;
+        ZIndex = 1;
+        Parent = Inner;
+        Visible = Config.Suffix ~= nil;
+    });
+
+    Library:AddToRegistry(SuffixLabel, {
+        TextColor3 = 'AccentColor';
+    });
 
     Window.Title = Config.Title or ''
     Window.Suffix = Config.Suffix
 
     local function updateTitleText()
+        WindowLabel.Text = Window.Title
         if Window.Suffix then
-            return Window.Title .. "<font color='#" .. Library.AccentColor:ToHex() .. "'>" .. Window.Suffix .. "</font>"
+            SuffixLabel.Text = Window.Suffix
+            SuffixLabel.Visible = true
+            SuffixLabel.Position = UDim2.new(0, 7 + WindowLabel.TextBounds.X, 0, 0)
+        else
+            SuffixLabel.Visible = false
         end
-        return Window.Title
     end
 
-    WindowLabel.Text = updateTitleText()
-    Library:AddToRegistry(WindowLabel, {
-        Text = updateTitleText
-    })
+    WindowLabel:GetPropertyChangedSignal('TextBounds'):Connect(function()
+        if Window.Suffix then
+            SuffixLabel.Position = UDim2.new(0, 7 + WindowLabel.TextBounds.X, 0, 0)
+        end
+    end)
+
+    updateTitleText()
 
     local MainSectionOuter = Library:Create('Frame', {
         BackgroundColor3 = Library.BackgroundColor;
