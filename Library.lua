@@ -3229,8 +3229,10 @@ function Library:CreateWindow(...)
         end;
 
         function Tab:ShowTab()
-            for _, Tab in next, Window.Tabs do
-                Tab:HideTab();
+            for _, T in next, Window.Tabs do
+                if T ~= Tab then
+                    T:HideTab();
+                end
             end;
 
             Blocker.BackgroundTransparency = 0;
@@ -3238,8 +3240,8 @@ function Library:CreateWindow(...)
             Library.RegistryMap[TabButton].Properties.BackgroundColor3 = 'MainColor';
             
             TabFrame.Visible = true;
-            TabFrame.Position = UDim2.new(0, 0, 0, 15);
-            TweenService:Create(TabFrame, TweenInfo.new(0.25, Enum.EasingStyle.Linear, Enum.EasingDirection.Out), { GroupTransparency = 0, Position = UDim2.new(0, 0, 0, 0) }):Play();
+            TabFrame.Position = UDim2.new(0, 0, 0, 10);
+            TweenService:Create(TabFrame, TweenInfo.new(0.15, Enum.EasingStyle.Linear, Enum.EasingDirection.Out), { GroupTransparency = 0, Position = UDim2.new(0, 0, 0, 0) }):Play();
         end;
 
         function Tab:HideTab()
@@ -3248,11 +3250,13 @@ function Library:CreateWindow(...)
             Library.RegistryMap[TabButton].Properties.BackgroundColor3 = 'BackgroundColor';
             
             if TabFrame.Visible then
-                local Tween = TweenService:Create(TabFrame, TweenInfo.new(0.25, Enum.EasingStyle.Linear, Enum.EasingDirection.Out), { GroupTransparency = 1, Position = UDim2.new(0, 0, 0, 15) });
+                local Tween = TweenService:Create(TabFrame, TweenInfo.new(0.15, Enum.EasingStyle.Linear, Enum.EasingDirection.Out), { GroupTransparency = 1, Position = UDim2.new(0, 0, 0, 10) });
                 Tween:Play();
 
                 Tween.Completed:Connect(function()
-                    TabFrame.Visible = false;
+                    if TabFrame.GroupTransparency > 0.5 then
+                        TabFrame.Visible = false;
+                    end
                 end);
             end
         end;
