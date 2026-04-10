@@ -3050,7 +3050,9 @@ function Library:CreateWindow(...)
     WindowLabel.Text = updateTitleText()
     Library:AddToRegistry(WindowLabel, {
         Text = updateTitleText
-    }):GetPropertyChangedSignal('TextBounds'):Connect(function()
+    })
+
+    WindowLabel:GetPropertyChangedSignal('TextBounds'):Connect(function()
         if Window.Suffix then
             SuffixLabel.Position = UDim2.new(0, 7 + WindowLabel.TextBounds.X, 0, 0)
         end
@@ -3089,7 +3091,7 @@ function Library:CreateWindow(...)
     local TabArea = Library:Create('Frame', {
         BackgroundTransparency = 1;
         Position = UDim2.new(0, 8, 0, 8);
-        Size = UDim2.new(1, -16, 0, 24);
+        Size = UDim2.new(1, -16, 0, 26);
         ZIndex = 1;
         Parent = MainSectionInner;
     });
@@ -3104,8 +3106,8 @@ function Library:CreateWindow(...)
     local TabContainer = Library:Create('Frame', {
         BackgroundColor3 = Library.MainColor;
         BorderColor3 = Library.OutlineColor;
-        Position = UDim2.new(0, 8, 0, 33);
-        Size = UDim2.new(1, -16, 1, -41);
+        Position = UDim2.new(0, 8, 0, 35);
+        Size = UDim2.new(1, -16, 1, -43);
         ZIndex = 2;
         Parent = MainSectionInner;
     });
@@ -3130,12 +3132,12 @@ function Library:CreateWindow(...)
             Tabboxes = {};
         };
 
-        local TabButtonWidth = Library:GetTextBounds(Name, Library.Font, 12);
+        local TabButtonWidth = math.max(Library:GetTextBounds(Name, Library.Font, 12), 20);
 
         local TabButton = Library:Create('Frame', {
             BackgroundColor3 = Library.BackgroundColor;
             BorderColor3 = Library.OutlineColor;
-            Size = UDim2.new(0, TabButtonWidth + 16, 1, 0);
+            Size = UDim2.new(0, TabButtonWidth + 20, 1, 0);
             ZIndex = 1;
             Parent = TabArea;
         });
