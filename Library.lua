@@ -3238,7 +3238,8 @@ function Library:CreateWindow(...)
             Library.RegistryMap[TabButton].Properties.BackgroundColor3 = 'MainColor';
             
             TabFrame.Visible = true;
-            TweenService:Create(TabFrame, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), { GroupTransparency = 0 }):Play();
+            TabFrame.Position = UDim2.new(0, 0, 0, 15);
+            TweenService:Create(TabFrame, TweenInfo.new(0.25, Enum.EasingStyle.Linear, Enum.EasingDirection.Out), { GroupTransparency = 0, Position = UDim2.new(0, 0, 0, 0) }):Play();
         end;
 
         function Tab:HideTab()
@@ -3247,7 +3248,7 @@ function Library:CreateWindow(...)
             Library.RegistryMap[TabButton].Properties.BackgroundColor3 = 'BackgroundColor';
             
             if TabFrame.Visible then
-                local Tween = TweenService:Create(TabFrame, TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), { GroupTransparency = 1 });
+                local Tween = TweenService:Create(TabFrame, TweenInfo.new(0.25, Enum.EasingStyle.Linear, Enum.EasingDirection.Out), { GroupTransparency = 1, Position = UDim2.new(0, 0, 0, 15) });
                 Tween:Play();
 
                 Tween.Completed:Connect(function()
