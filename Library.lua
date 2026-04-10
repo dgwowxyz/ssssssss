@@ -3002,7 +3002,7 @@ function Library:CreateWindow(...)
 
     local function updateTitleText()
         if Window.Suffix then
-            return Window.Title .. " <font color='#" .. Library.AccentColor:ToHex() .. "'>" .. Window.Suffix .. "</font>"
+            return Window.Title .. "<font color='#" .. Library.AccentColor:ToHex() .. "'>" .. Window.Suffix .. "</font>"
         end
         return Window.Title
     end
