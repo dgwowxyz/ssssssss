@@ -3169,15 +3169,28 @@ function Library:CreateWindow(...)
             BackgroundColor3 = 'MainColor';
         });
 
-        local TabFrame = Library:Create('CanvasGroup', {
+        local TabFrame = Library:Create('Frame', {
             Name = 'TabFrame',
             BackgroundTransparency = 1;
             Position = UDim2.new(0, 0, 0, 0);
             Size = UDim2.new(1, 0, 1, 0);
             Visible = false;
             ZIndex = 2;
-            GroupTransparency = 1;
             Parent = TabContainer;
+        });
+
+        local Fader = Library:Create('Frame', {
+            BackgroundColor3 = Library.MainColor;
+            BackgroundTransparency = 1;
+            BorderSizePixel = 0;
+            Position = UDim2.new(0, 0, 0, 0);
+            Size = UDim2.new(1, 0, 1, 0);
+            ZIndex = 100;
+            Parent = TabFrame;
+        });
+
+        Library:AddToRegistry(Fader, {
+            BackgroundColor3 = 'MainColor';
         });
 
         local LeftSide = Library:Create('ScrollingFrame', {
@@ -3240,8 +3253,11 @@ function Library:CreateWindow(...)
             Library.RegistryMap[TabButton].Properties.BackgroundColor3 = 'MainColor';
             
             TabFrame.Visible = true;
+            Fader.BackgroundTransparency = 0;
             TabFrame.Position = UDim2.new(0, 0, 0, 10);
-            TweenService:Create(TabFrame, TweenInfo.new(0.15, Enum.EasingStyle.Linear, Enum.EasingDirection.Out), { GroupTransparency = 0, Position = UDim2.new(0, 0, 0, 0) }):Play();
+
+            TweenService:Create(Fader, TweenInfo.new(0.15, Enum.EasingStyle.Linear, Enum.EasingDirection.Out), { BackgroundTransparency = 1 }):Play();
+            TweenService:Create(TabFrame, TweenInfo.new(0.15, Enum.EasingStyle.Linear, Enum.EasingDirection.Out), { Position = UDim2.new(0, 0, 0, 0) }):Play();
         end;
 
         function Tab:HideTab()
@@ -3250,11 +3266,13 @@ function Library:CreateWindow(...)
             Library.RegistryMap[TabButton].Properties.BackgroundColor3 = 'BackgroundColor';
             
             if TabFrame.Visible then
-                local Tween = TweenService:Create(TabFrame, TweenInfo.new(0.15, Enum.EasingStyle.Linear, Enum.EasingDirection.Out), { GroupTransparency = 1, Position = UDim2.new(0, 0, 0, 10) });
+                Fader.BackgroundTransparency = 1;
+                local Tween = TweenService:Create(Fader, TweenInfo.new(0.15, Enum.EasingStyle.Linear, Enum.EasingDirection.Out), { BackgroundTransparency = 0 });
+                TweenService:Create(TabFrame, TweenInfo.new(0.15, Enum.EasingStyle.Linear, Enum.EasingDirection.Out), { Position = UDim2.new(0, 0, 0, 10) }):Play();
+                
                 Tween:Play();
-
                 Tween.Completed:Connect(function()
-                    if TabFrame.GroupTransparency > 0.5 then
+                    if Fader.BackgroundTransparency < 0.5 then
                         TabFrame.Visible = false;
                     end
                 end);
