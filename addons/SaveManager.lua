@@ -201,7 +201,7 @@ local SaveManager = {} do
 	function SaveManager:BuildConfigSection(tab)
 		assert(self.Library, 'Must set SaveManager.Library')
 
-		local section = tab:AddLeftGroupbox('configs')
+		local section = tab:AddRightGroupbox('configs')
 
 		section:AddInput('SaveManager_ConfigName',    { Text = 'config name' })
 		section:AddDropdown('SaveManager_ConfigList', { Text = 'config list', Values = self:RefreshConfigList(), AllowNull = true })
