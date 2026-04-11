@@ -2181,12 +2181,20 @@ do
             local function startCapture()
                 if popupCaptureConn then return end
                 popupCaptureConn = ScreenGui.ChildAdded:Connect(function(child)
-                    -- Immediately reparent dropdown/colorpicker popups to PropsGui
-                    -- so they appear above the properties window (not hidden behind it)
-                    if SubOuter.Visible and child.Parent == ScreenGui then
-                        child.Parent = PropsGui
+                    if SubOuter.Visible then
+                        task.defer(function()
+                            if child.Parent == ScreenGui then
+                                child.Parent = PropsGui
+                            end
+                        end)
                     end
                 end)
+                
+                for _, child in next, ScreenGui:GetChildren() do
+                    if child.Name == 'Color' or (child:IsA('Frame') and child.ZIndex >= 100) then
+                        child.Parent = PropsGui
+                    end
+                end
             end
 
             local function stopCapture()
