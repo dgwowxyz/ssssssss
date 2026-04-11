@@ -1203,27 +1203,24 @@ do
             TweenService:Create(Library.KeybindFrame, TweenInfo.new(Library.TweenTime, Library.TweenStyle, Enum.EasingDirection.Out), { Size = TargetSize }):Play();
 
             local ShouldBeVisible = (YSize > 0);
-            if ShouldBeVisible ~= Library.KeybindFrame.Visible then
-                local Fader = Library.KeybindFrame:FindFirstChild('Fader', true);
+            local Fader = Library.KeybindFrame:FindFirstChild('Fader', true);
 
-                if ShouldBeVisible then
-                    Library.KeybindFrame.Visible = true;
-                    if Fader then
-                        Fader.BackgroundTransparency = 0;
-                        TweenService:Create(Fader, TweenInfo.new(Library.TweenTime, Library.TweenStyle, Enum.EasingDirection.Out), { BackgroundTransparency = 1 }):Play();
-                    end
+            if ShouldBeVisible then
+                Library.KeybindFrame.Visible = true;
+                if Fader then
+                    TweenService:Create(Fader, TweenInfo.new(Library.TweenTime, Library.TweenStyle, Enum.EasingDirection.Out), { BackgroundTransparency = 1 }):Play();
+                end
+            elseif Library.KeybindFrame.Visible then
+                if Fader then
+                    local Tween = TweenService:Create(Fader, TweenInfo.new(Library.TweenTime, Library.TweenStyle, Enum.EasingDirection.Out), { BackgroundTransparency = 0 });
+                    Tween:Play();
+                    Tween.Completed:Connect(function()
+                        if not (Library.KeybindContainer:FindFirstChildOfClass('TextLabel') and Library.KeybindContainer:FindFirstChildOfClass('TextLabel').Visible) then
+                            Library.KeybindFrame.Visible = false;
+                        end
+                    end);
                 else
-                    if Fader then
-                        local Tween = TweenService:Create(Fader, TweenInfo.new(Library.TweenTime, Library.TweenStyle, Enum.EasingDirection.Out), { BackgroundTransparency = 0 });
-                        Tween:Play();
-                        Tween.Completed:Connect(function()
-                            if not (Library.KeybindContainer:FindFirstChildOfClass('TextLabel') and Library.KeybindContainer:FindFirstChildOfClass('TextLabel').Visible) then
-                                Library.KeybindFrame.Visible = false;
-                            end
-                        end);
-                    else
-                        Library.KeybindFrame.Visible = false;
-                    end
+                    Library.KeybindFrame.Visible = false;
                 end
             end
 
@@ -3243,20 +3240,6 @@ function Library:CreateWindow(...)
             Parent = TabContainer;
         });
 
-        local Fader = Library:Create('Frame', {
-            BackgroundColor3 = Library.MainColor;
-            BackgroundTransparency = 1;
-            BorderSizePixel = 0;
-            Position = UDim2.new(0, 0, 0, 0);
-            Size = UDim2.new(1, 0, 1, 0);
-            ZIndex = 100;
-            Parent = TabFrame;
-        });
-
-        Library:AddToRegistry(Fader, {
-            BackgroundColor3 = 'MainColor';
-        });
-
         local LeftSide = Library:Create('ScrollingFrame', {
             BackgroundTransparency = 1;
             BorderSizePixel = 0;
@@ -3320,9 +3303,6 @@ function Library:CreateWindow(...)
             Library.RegistryMap[TabButtonLabel].Properties.TextColor3 = 'AccentColor';
 
             TabFrame.Visible = true;
-            Fader.BackgroundTransparency = 0;
-
-            TweenService:Create(Fader, TweenInfo.new(Library.TweenTime, Library.TweenStyle, Enum.EasingDirection.Out), { BackgroundTransparency = 1 }):Play();
         end;
 
         function Tab:HideTab()
@@ -3333,17 +3313,7 @@ function Library:CreateWindow(...)
             TabButtonLabel.TextColor3 = Library.FontColor;
             Library.RegistryMap[TabButtonLabel].Properties.TextColor3 = 'FontColor';
 
-            if TabFrame.Visible then
-                Fader.BackgroundTransparency = 1;
-                local Tween = TweenService:Create(Fader, TweenInfo.new(Library.TweenTime, Library.TweenStyle, Enum.EasingDirection.Out), { BackgroundTransparency = 0 });
-                
-                Tween:Play();
-                Tween.Completed:Connect(function()
-                    if Fader.BackgroundTransparency < 0.5 then
-                        TabFrame.Visible = false;
-                    end
-                end);
-            end
+            TabFrame.Visible = false;
         end;
 
         function Tab:SetLayoutOrder(Position)
