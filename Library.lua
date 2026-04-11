@@ -959,10 +959,6 @@ do
 
             PickerFrameOuter.Visible = true;
             Library.OpenedFrames[PickerFrameOuter] = true;
-
-            -- Signal for Property windows to capture this popup
-            Library.ScreenGui.Name = "CapturedPopup"
-            Library.ScreenGui.Name = "ScreenGui"
         end;
 
         function ColorPicker:Hide()
@@ -2098,8 +2094,8 @@ do
             -- correctly render above groupbox frames (ZIndex=4) within this window.
             local PropsGui = Instance.new('ScreenGui')
             ProtectGui(PropsGui)
-            PropsGui.ZIndexBehavior = Enum.ZIndexBehavior.Global
-            PropsGui.DisplayOrder = 100
+            PropsGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+            PropsGui.DisplayOrder = 10
             PropsGui.Name = 'PropertiesGui_' .. Info.Text
             PropsGui.Parent = CoreGui
 
@@ -2108,7 +2104,7 @@ do
                 BackgroundColor3 = Color3.new(0, 0, 0),
                 BorderColor3 = Color3.new(0, 0, 0),
                 Position = UDim2.fromOffset(200, 150),
-                Size = UDim2.fromOffset(269, 300),
+                Size = UDim2.fromOffset(265, 300),
                 Visible = false,
                 ZIndex = 1,
                 Parent = PropsGui,
@@ -2134,19 +2130,9 @@ do
             })
             Library:AddToRegistry(TitleBar, { BackgroundColor3 = 'BackgroundColor', BorderColor3 = 'OutlineColor' })
 
-            Library:Create('ImageLabel', {
-                BackgroundTransparency = 1,
-                Position = UDim2.new(0, 4, 0, 4),
-                Size = UDim2.new(0, 14, 0, 14),
-                Image = 'rbxassetid://4492476134',
-                ImageColor3 = Color3.new(1, 1, 1),
-                ZIndex = 5,
-                Parent = TitleBar,
-            })
-
             Library:CreateLabel({
-                Position = UDim2.new(0, 22, 0, 0),
-                Size = UDim2.new(1, -22, 1, 0),
+                Position = UDim2.new(0, 6, 0, 0),
+                Size = UDim2.new(1, -6, 1, 0),
                 Text = Info.Text .. ' - properties',
                 TextXAlignment = Enum.TextXAlignment.Left,
                 ZIndex = 4,
@@ -2195,37 +2181,13 @@ do
             local function startCapture()
                 if popupCaptureConn then return end
                 popupCaptureConn = ScreenGui.ChildAdded:Connect(function(child)
-                    if SubOuter.Visible then
-                        task.defer(function()
-                            if child.Parent == ScreenGui then
-                                child.Parent = PropsGui
-                            end
-                        end)
-                    end
-                end)
-
-                -- Listen for property changes on ScreenGui as a signal to re-check popups
-                local signalConn = ScreenGui:GetPropertyChangedSignal("Name"):Connect(function()
-                    if SubOuter.Visible then
-                        for _, child in next, ScreenGui:GetChildren() do
-                            if child.Name == 'Color' or (child:IsA('Frame') and child.ZIndex >= 100) then
-                                child.Parent = PropsGui
-                            end
+                    task.defer(function()
+                        -- Only reroute if this props window is the active one
+                        if SubOuter.Visible and child and child.Parent == ScreenGui then
+                            child.Parent = PropsGui
                         end
-                    end
+                    end)
                 end)
-                
-                for _, child in next, ScreenGui:GetChildren() do
-                    if child.Name == 'Color' or (child:IsA('Frame') and child.ZIndex >= 100) then
-                        child.Parent = PropsGui
-                    end
-                end
-
-                local oldStop = stopCapture
-                stopCapture = function()
-                    if signalConn then signalConn:Disconnect() end
-                    oldStop()
-                end
             end
 
             local function stopCapture()
@@ -2770,7 +2732,7 @@ do
         local ListOuter = Library:Create('Frame', {
             BackgroundColor3 = Color3.new(0, 0, 0);
             BorderColor3 = Color3.new(0, 0, 0);
-            ZIndex = 100;
+            ZIndex = 20;
             Visible = false;
             ClipsDescendants = true;
             Size = UDim2.fromOffset(0, 0),
@@ -2796,7 +2758,7 @@ do
             BorderMode = Enum.BorderMode.Inset;
             BorderSizePixel = 0;
             Size = UDim2.new(1, 0, 1, 0);
-            ZIndex = 101;
+            ZIndex = 21;
             Parent = ListOuter;
         });
 
@@ -2810,7 +2772,7 @@ do
             BorderSizePixel = 0;
             CanvasSize = UDim2.new(0, 0, 0, 0);
             Size = UDim2.new(1, 0, 1, 0);
-            ZIndex = 101;
+            ZIndex = 21;
             Parent = ListInner;
 
             TopImage = 'rbxasset://textures/ui/Scroll/scroll-middle.png',
@@ -3004,10 +2966,6 @@ do
 
             local Y = math.clamp(Count * 20, 0, MAX_DROPDOWN_ITEMS * 20) + 1;
             Library:TweenProperty(ListOuter, 'Size', UDim2.fromOffset(DropdownOuter.AbsoluteSize.X, Y))
-
-            -- Signal for Property windows to capture this popup
-            Library.ScreenGui.Name = "CapturedPopup"
-            Library.ScreenGui.Name = "ScreenGui"
         end;
 
         function Dropdown:CloseDropdown()
@@ -3529,7 +3487,7 @@ function Library:CreateWindow(...)
     if type(Config.MenuFadeTime) ~= 'number' then Config.MenuFadeTime = 0.2 end
 
     if typeof(Config.Position) ~= 'UDim2' then Config.Position = UDim2.fromOffset(175, 50) end
-    if typeof(Config.Size) ~= 'UDim2' then Config.Size = UDim2.fromOffset(546, 600) end
+    if typeof(Config.Size) ~= 'UDim2' then Config.Size = UDim2.fromOffset(550, 600) end
 
     if Config.Center then
         Config.AnchorPoint = Vector2.new(0.5, 0.5)
