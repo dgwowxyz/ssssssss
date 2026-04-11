@@ -40,7 +40,9 @@ local Library = {
     Font = Enum.Font.Code,
 
     TweenStyle = Enum.EasingStyle.Linear,
+    TweenDirection = Enum.EasingDirection.Out,
     TweenTime = 0.15,
+    DragTime = 0.08,
 
     OpenedFrames = {};
     DependencyBoxes = {};
@@ -191,7 +193,7 @@ function Library:MakeDraggable(Instance, Cutoff)
                     Mouse.Y - ObjPos.Y + (Instance.Size.Y.Offset * Instance.AnchorPoint.Y)
                 );
 
-                TweenService:Create(Instance, TweenInfo.new(Library.TweenTime, Library.TweenStyle, Enum.EasingDirection.Out), { Position = TargetPos }):Play();
+                TweenService:Create(Instance, TweenInfo.new(Library.DragTime, Library.TweenStyle, Library.TweenDirection), { Position = TargetPos }):Play();
 
                 RenderStepped:Wait();
             end;
@@ -1200,7 +1202,7 @@ do
             end;
 
             local TargetSize = UDim2.new(0, math.max(XSize + 10, 210), 0, YSize + 23)
-            TweenService:Create(Library.KeybindFrame, TweenInfo.new(Library.TweenTime, Library.TweenStyle, Enum.EasingDirection.Out), { Size = TargetSize }):Play();
+            TweenService:Create(Library.KeybindFrame, TweenInfo.new(Library.TweenTime, Library.TweenStyle, Library.TweenDirection), { Size = TargetSize }):Play();
 
             local ShouldBeVisible = (YSize > 0);
             local Fader = Library.KeybindFrame:FindFirstChild('Fader', true);
@@ -1208,12 +1210,12 @@ do
             if ShouldBeVisible then
                 Library.KeybindFrame.Visible = true;
                 if Fader then
-                    TweenService:Create(Fader, TweenInfo.new(Library.TweenTime, Library.TweenStyle, Enum.EasingDirection.Out), { BackgroundTransparency = 1 }):Play();
+                    TweenService:Create(Fader, TweenInfo.new(Library.TweenTime, Library.TweenStyle, Library.TweenDirection), { BackgroundTransparency = 1 }):Play();
                 end
             elseif Library.KeybindFrame.Visible then
                 if Fader then
-                    local SizeTween = TweenService:Create(Library.KeybindFrame, TweenInfo.new(Library.TweenTime, Library.TweenStyle, Enum.EasingDirection.Out), { Size = TargetSize });
-                    local FadeTween = TweenService:Create(Fader, TweenInfo.new(Library.TweenTime, Library.TweenStyle, Enum.EasingDirection.Out), { BackgroundTransparency = 0 });
+                    local SizeTween = TweenService:Create(Library.KeybindFrame, TweenInfo.new(Library.TweenTime, Library.TweenStyle, Library.TweenDirection), { Size = TargetSize });
+                    local FadeTween = TweenService:Create(Fader, TweenInfo.new(Library.TweenTime, Library.TweenStyle, Library.TweenDirection), { BackgroundTransparency = 0 });
                     
                     SizeTween:Play();
                     FadeTween:Play();
@@ -3769,7 +3771,7 @@ function Library:CreateWindow(...)
                     continue;
                 end;
 
-                TweenService:Create(Desc, TweenInfo.new(Library.TweenTime, Library.TweenStyle, Enum.EasingDirection.Out), { [Prop] = Toggled and Cache[Prop] or 1 }):Play();
+                TweenService:Create(Desc, TweenInfo.new(Library.TweenTime, Library.TweenStyle, Library.TweenDirection), { [Prop] = Toggled and Cache[Prop] or 1 }):Play();
             end;
         end;
 
