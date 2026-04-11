@@ -3254,10 +3254,8 @@ function Library:CreateWindow(...)
             
             TabFrame.Visible = true;
             Fader.BackgroundTransparency = 0;
-            TabFrame.Position = UDim2.new(0, 0, 0, 10);
 
             TweenService:Create(Fader, TweenInfo.new(0.15, Enum.EasingStyle.Linear, Enum.EasingDirection.Out), { BackgroundTransparency = 1 }):Play();
-            TweenService:Create(TabFrame, TweenInfo.new(0.15, Enum.EasingStyle.Linear, Enum.EasingDirection.Out), { Position = UDim2.new(0, 0, 0, 0) }):Play();
         end;
 
         function Tab:HideTab()
@@ -3268,7 +3266,6 @@ function Library:CreateWindow(...)
             if TabFrame.Visible then
                 Fader.BackgroundTransparency = 1;
                 local Tween = TweenService:Create(Fader, TweenInfo.new(0.15, Enum.EasingStyle.Linear, Enum.EasingDirection.Out), { BackgroundTransparency = 0 });
-                TweenService:Create(TabFrame, TweenInfo.new(0.15, Enum.EasingStyle.Linear, Enum.EasingDirection.Out), { Position = UDim2.new(0, 0, 0, 10) }):Play();
                 
                 Tween:Play();
                 Tween.Completed:Connect(function()
