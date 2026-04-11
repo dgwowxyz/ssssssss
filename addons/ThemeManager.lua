@@ -21,7 +21,7 @@ local ThemeManager = {} do
 		['nekocheat blue'] = { 13, httpService:JSONDecode('{"FontColor":"ffffff","MainColor":"121212","AccentColor":"00f7ff","BackgroundColor":"121212","OutlineColor":"3c3c3c"}') },
 		['twitch'] = { 14, httpService:JSONDecode('{"FontColor":"ebebeb","MainColor":"1f1f23","AccentColor":"a970ff","BackgroundColor":"0e0e0e","OutlineColor":"2d2d2d"}') },
 		['missclick.lua'] = { 15, httpService:JSONDecode('{"FontColor":"ebebeb","MainColor":"121212","AccentColor":"bd00ff","BackgroundColor":"121212","OutlineColor":"34003a"}') },
-		['gamesense'] = { 16, httpService:JSONDecode('{"FontColor":"ebebeb","MainColor":"111111","AccentColor":"8aa90d","BackgroundColor":"111111","OutlineColor":"2f2f2f"}') },
+		['gamesense'] = { 16, httpService:JSONDecode('{"FontColor":"ebebeb","MainColor":"111111","AccentColor":"badf25","BackgroundColor":"111111","OutlineColor":"2f2f2f"}') },
 	}
 
 	function ThemeManager:ApplyTheme(theme)
