@@ -3278,6 +3278,7 @@ function Library:CreateWindow(...)
         Padding = UDim.new(0, Config.TabPadding);
         FillDirection = Enum.FillDirection.Horizontal;
         SortOrder = Enum.SortOrder.LayoutOrder;
+        HorizontalFlex = Enum.UIFlexAlignment.Fill;
         Parent = TabArea;
     });
 
@@ -3310,12 +3311,10 @@ function Library:CreateWindow(...)
             Tabboxes = {};
         };
 
-        local TabButtonWidth = math.max(Library:GetTextBounds(Name, Library.Font, 12), 20);
-
         local TabButton = Library:Create('Frame', {
             BackgroundColor3 = Library.BackgroundColor;
             BorderColor3 = Library.OutlineColor;
-            Size = UDim2.new(0, TabButtonWidth + 20, 1, 0);
+            Size = UDim2.new(1, 0, 1, 0);
             ZIndex = 1;
             Parent = TabArea;
         });
