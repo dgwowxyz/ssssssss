@@ -52,6 +52,7 @@ local Library = {
 
     Signals = {};
     ScreenGui = ScreenGui;
+    Notifications = { Notifs = {} };
 };
 
 local RainbowStep = 0
@@ -3058,96 +3059,222 @@ function Library:SetWatermark(Text)
     Library.WatermarkText.Text = Text;
 end;
 
-function Library:Notify(Text, Time)
-    local XSize, YSize = Library:GetTextBounds(Text, Library.Font, 14);
+function Library:FadeNotification(path, is_fading)
+    task.spawn(function()
+        for _, obj in next, path:GetDescendants() do
+            if obj:IsA('TextLabel') or obj:IsA('TextButton') then
+                TweenService:Create(obj, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), { TextTransparency = is_fading and 1 or 0 }):Play();
+                TweenService:Create(obj, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), { TextStrokeTransparency = is_fading and 1 or 0 }):Play();
+            elseif obj:IsA('Frame') then
+                TweenService:Create(obj, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), { BackgroundTransparency = is_fading and 1 or 0 }):Play();
+            elseif obj:IsA('UIStroke') then
+                TweenService:Create(obj, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), { Transparency = is_fading and 1 or 0 }):Play();
+            end;
+        end;
 
-    YSize = YSize + 7
+        if path:IsA('Frame') then
+            TweenService:Create(path, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), { BackgroundTransparency = is_fading and 1 or 0 }):Play();
+        end;
+    end);
+end;
 
-    local NotifyOuter = Library:Create('Frame', {
-        BorderColor3 = Color3.new(0, 0, 0);
-        Position = UDim2.new(0, 100, 0, 10);
-        Size = UDim2.new(0, 0, 0, YSize);
-        ClipsDescendants = true;
-        ZIndex = 100;
-        Parent = Library.NotificationArea;
-    });
+function Library:ReorderNotifications()
+    local Offset = 20;
 
-    local NotifyInner = Library:Create('Frame', {
+    for _, v in next, Library.Notifications.Notifs do
+        v.Position = UDim2.new(0, 20, 0, Offset);
+        Offset = Offset + v.AbsoluteSize.Y + 5;
+    end;
+
+    return Offset;
+end;
+
+function Library:Notification(properties)
+    local Cfg = {
+        Name = properties.Name or "Notification";
+        Lifetime = properties.Lifetime or 5;
+        Items = {};
+    };
+
+    local Index = #Library.Notifications.Notifs + 1;
+    local Items = Cfg.Items;
+
+    do
+        Items.Holder = Library:Create('Frame', {
+            Name = 'NotificationHolder';
+            Parent = Library.ScreenGui;
+            Size = UDim2.new(0, 0, 0, 26);
+            Position = UDim2.new(0, 20, 0, 20);
+            BackgroundColor3 = Color3.new(0, 0, 0);
+            BorderSizePixel = 0;
+            AnchorPoint = Vector2.new(1, 0); -- Start off-screen/offset
+            AutomaticSize = Enum.AutomaticSize.X;
+        });
+
+        Items.Notification = Library:Create('Frame', {
+            Parent = Items.Holder;
+            Size = UDim2.new(1, -2, 1, -2);
+            Position = UDim2.new(0, 1, 0, 1);
+            BackgroundColor3 = Library.MainColor;
+            BorderColor3 = Library.OutlineColor;
+            BorderMode = Enum.BorderMode.Inset;
+        });
+
+        Library:AddToRegistry(Items.Notification, {
+            BackgroundColor3 = 'MainColor';
+            BorderColor3 = 'OutlineColor';
+        }, true);
+
+        Items.Accent = Library:Create('Frame', {
+            Name = 'Accent';
+            Parent = Items.Notification;
+            Position = UDim2.new(0, 2, 0, 2);
+            Size = UDim2.new(0, 2, 1, -4);
+            BackgroundColor3 = Library.AccentColor;
+            BorderSizePixel = 0;
+            ZIndex = 3;
+        });
+
+        Library:AddToRegistry(Items.Accent, {
+            BackgroundColor3 = 'AccentColor';
+        }, true);
+
+        Items.Background = Library:Create('Frame', {
+            Parent = Items.Notification;
+            Size = UDim2.new(1, -4, 1, -4);
+            Position = UDim2.new(0, 2, 0, 2);
+            BackgroundTransparency = 1;
+            BorderSizePixel = 0;
+            ZIndex = 2;
+        });
+
+        Items.Title = Library:Create('TextLabel', {
+            Parent = Items.Notification;
+            Text = Cfg.Name;
+            TextColor3 = Library.FontColor;
+            Font = Library.Font;
+            TextSize = 12;
+            TextXAlignment = Enum.TextXAlignment.Left;
+            BackgroundTransparency = 1;
+            ZIndex = 3;
+            AutomaticSize = Enum.AutomaticSize.XY;
+            Position = UDim2.new(0, 10, 0.5, 0);
+            AnchorPoint = Vector2.new(0, 0.5);
+        });
+
+        Library:ApplyTextStroke(Items.Title);
+
+        Library:AddToRegistry(Items.Title, {
+            TextColor3 = 'FontColor';
+            FontFace = 'Font';
+        }, true);
+
+        Items.ButtonHolder = Library:Create('Frame', {
+            Parent = Items.Notification;
+            BackgroundTransparency = 1;
+            AutomaticSize = Enum.AutomaticSize.X;
+            Size = UDim2.new(0, 0, 1, 0);
+            Position = UDim2.new(1, 0, 0, 0);
+            AnchorPoint = Vector2.new(1, 0);
+        });
+
+        Library:Create('UIListLayout', {
+            Parent = Items.ButtonHolder;
+            FillDirection = Enum.FillDirection.Horizontal;
+            SortOrder = Enum.SortOrder.LayoutOrder;
+            Padding = UDim.new(0, 5);
+        });
+
+        Library:Create('UIPadding', {
+            Parent = Items.ButtonHolder;
+            PaddingRight = UDim.new(0, 5);
+            PaddingLeft = UDim.new(0, 10);
+        });
+    end
+
+    function Cfg.DestroyNotif()
+        local Tween = TweenService:Create(Items.Holder, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.In), { AnchorPoint = Vector2.new(1, 0) });
+        Library:FadeNotification(Items.Holder, true);
+        Tween:Play();
+
+        Tween.Completed:Connect(function()
+            Items.Holder:Destroy();
+            
+            local CurrentIndex = table.find(Library.Notifications.Notifs, Items.Holder);
+            if CurrentIndex then
+                table.remove(Library.Notifications.Notifs, CurrentIndex);
+            end
+
+            Library:ReorderNotifications();
+        end);
+    end
+
+    local Offset = Library:ReorderNotifications();
+    table.insert(Library.Notifications.Notifs, Items.Holder);
+    
+    Library:FadeNotification(Items.Holder, false);
+    TweenService:Create(Items.Holder, TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), { AnchorPoint = Vector2.new(0, 0) }):Play();
+
+    Items.Holder.Position = UDim2.new(0, 20, 0, Offset);
+
+    if Cfg.Lifetime then
+        task.spawn(function()
+            task.wait(Cfg.Lifetime);
+            Cfg.DestroyNotif();
+        end);
+    end
+
+    return setmetatable(Cfg, { __index = Library });
+end
+
+function Library:NotificationButton(properties)
+    local Cfg = {
+        Name = properties.Name or "Button";
+        Callback = properties.Callback or function() end;
+    };
+
+    local Items = {};
+
+    Items.Button = Library:Create('TextButton', {
+        Parent = self.Items.ButtonHolder;
+        Text = Cfg.Name;
+        TextColor3 = Library.FontColor;
+        Font = Library.Font;
+        TextSize = 12;
+        Size = UDim2.new(0, 0, 1, -10);
+        Position = UDim2.new(0, 0, 0.5, 0);
+        AnchorPoint = Vector2.new(0, 0.5);
         BackgroundColor3 = Library.MainColor;
         BorderColor3 = Library.OutlineColor;
         BorderMode = Enum.BorderMode.Inset;
-        Size = UDim2.new(1, 0, 1, 0);
-        ZIndex = 101;
-        Parent = NotifyOuter;
+        AutomaticSize = Enum.AutomaticSize.X;
     });
 
-    Library:AddToRegistry(NotifyInner, {
+    Library:ApplyTextStroke(Items.Button);
+
+    Library:AddToRegistry(Items.Button, {
+        TextColor3 = 'FontColor';
+        FontFace = 'Font';
         BackgroundColor3 = 'MainColor';
         BorderColor3 = 'OutlineColor';
     }, true);
 
-    local InnerFrame = Library:Create('Frame', {
-        BackgroundColor3 = Color3.new(1, 1, 1);
-        BorderSizePixel = 0;
-        Position = UDim2.new(0, 1, 0, 1);
-        Size = UDim2.new(1, -2, 1, -2);
-        ZIndex = 102;
-        Parent = NotifyInner;
+    Library:Create('UIPadding', {
+        Parent = Items.Button;
+        PaddingLeft = UDim.new(0, 5);
+        PaddingRight = UDim.new(0, 5);
     });
 
-    local Gradient = Library:Create('UIGradient', {
-        Color = ColorSequence.new({
-            ColorSequenceKeypoint.new(0, Library:GetDarkerColor(Library.MainColor)),
-            ColorSequenceKeypoint.new(1, Library.MainColor),
-        });
-        Rotation = -90;
-        Parent = InnerFrame;
-    });
-
-    Library:AddToRegistry(Gradient, {
-        Color = function()
-            return ColorSequence.new({
-                ColorSequenceKeypoint.new(0, Library:GetDarkerColor(Library.MainColor)),
-                ColorSequenceKeypoint.new(1, Library.MainColor),
-            });
-        end
-    });
-
-    local NotifyLabel = Library:CreateLabel({
-        Position = UDim2.new(0, 4, 0, 0);
-        Size = UDim2.new(1, -4, 1, 0);
-        Text = Text;
-        TextXAlignment = Enum.TextXAlignment.Left;
-        TextSize = 12;
-        ZIndex = 103;
-        Parent = InnerFrame;
-    });
-
-    local LeftColor = Library:Create('Frame', {
-        BackgroundColor3 = Library.AccentColor;
-        BorderSizePixel = 0;
-        Position = UDim2.new(0, -1, 0, -1);
-        Size = UDim2.new(0, 3, 1, 2);
-        ZIndex = 104;
-        Parent = NotifyOuter;
-    });
-
-    Library:AddToRegistry(LeftColor, {
-        BackgroundColor3 = 'AccentColor';
-    }, true);
-
-    pcall(NotifyOuter.TweenSize, NotifyOuter, UDim2.new(0, XSize + 8 + 4, 0, YSize), 'Out', 'Quad', 0.4, true);
-
-    task.spawn(function()
-        wait(Time or 5);
-
-        pcall(NotifyOuter.TweenSize, NotifyOuter, UDim2.new(0, 0, 0, YSize), 'Out', 'Quad', 0.4, true);
-
-        wait(0.4);
-
-        NotifyOuter:Destroy();
+    Items.Button.MouseButton1Click:Connect(function()
+        Cfg.Callback();
     end);
-end;
+
+    return Cfg;
+end
+
+function Library:Notify(Text, Time)
+    return Library:Notification({ Name = Text, Lifetime = Time });
+end
 
 function Library:CreateWindow(...)
     local Arguments = { ... }
