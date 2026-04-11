@@ -2090,15 +2090,24 @@ do
                 Parent = IconWrapper,
             })
 
-            -- Draggable sub-window
+            -- Own ScreenGui with Sibling ZIndex so toggle elements (ZIndex=5+)
+            -- correctly render above groupbox frames (ZIndex=4) within this window.
+            local PropsGui = Instance.new('ScreenGui')
+            ProtectGui(PropsGui)
+            PropsGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+            PropsGui.DisplayOrder = 10
+            PropsGui.Name = 'PropertiesGui_' .. Info.Text
+            PropsGui.Parent = CoreGui
+
+            -- Outer black border frame
             local SubOuter = Library:Create('Frame', {
                 BackgroundColor3 = Color3.new(0, 0, 0),
                 BorderColor3 = Color3.new(0, 0, 0),
                 Position = UDim2.fromOffset(200, 150),
                 Size = UDim2.fromOffset(320, 340),
                 Visible = false,
-                ZIndex = 100,
-                Parent = ScreenGui,
+                ZIndex = 1,
+                Parent = PropsGui,
             })
 
             local SubInner = Library:Create('Frame', {
@@ -2106,7 +2115,7 @@ do
                 BorderColor3 = Library.OutlineColor,
                 BorderMode = Enum.BorderMode.Inset,
                 Size = UDim2.new(1, 0, 1, 0),
-                ZIndex = 101,
+                ZIndex = 2,
                 Parent = SubOuter,
             })
             Library:AddToRegistry(SubInner, { BackgroundColor3 = 'MainColor', BorderColor3 = 'OutlineColor' })
@@ -2116,17 +2125,17 @@ do
                 BackgroundColor3 = Library.BackgroundColor,
                 BorderColor3 = Library.OutlineColor,
                 Size = UDim2.new(1, 0, 0, 22),
-                ZIndex = 102,
+                ZIndex = 3,
                 Parent = SubInner,
             })
             Library:AddToRegistry(TitleBar, { BackgroundColor3 = 'BackgroundColor', BorderColor3 = 'OutlineColor' })
 
-            local TitleLabel = Library:CreateLabel({
+            Library:CreateLabel({
                 Position = UDim2.new(0, 6, 0, 0),
                 Size = UDim2.new(1, -6, 1, 0),
                 Text = Info.Text .. ' - properties',
                 TextXAlignment = Enum.TextXAlignment.Left,
-                ZIndex = 103,
+                ZIndex = 4,
                 Parent = TitleBar,
             })
 
@@ -2136,7 +2145,7 @@ do
                 BorderColor3 = Library.OutlineColor,
                 Position = UDim2.new(0, 0, 0, 22),
                 Size = UDim2.new(1, 0, 0, 22),
-                ZIndex = 102,
+                ZIndex = 3,
                 Parent = SubInner,
             })
             Library:AddToRegistry(TabBar, { BackgroundColor3 = 'BackgroundColor', BorderColor3 = 'OutlineColor' })
@@ -2146,16 +2155,17 @@ do
                 Parent = TabBar,
             })
 
-            -- Content area
+            -- Content area (transparent container below title+tabs)
             local ContentArea = Library:Create('Frame', {
                 BackgroundTransparency = 1,
                 Position = UDim2.new(0, 0, 0, 44),
                 Size = UDim2.new(1, 0, 1, -44),
-                ZIndex = 101,
+                ZIndex = 2,
                 Parent = SubInner,
             })
 
             Library:MakeDraggable(SubOuter)
+
 
             -- Click on wrapper frame to toggle window
             IconWrapper.InputBegan:Connect(function(Input)
@@ -2274,7 +2284,7 @@ do
                         BorderColor3 = Library.OutlineColor,
                         BorderMode = Enum.BorderMode.Inset,
                         Size = UDim2.new(1, 0, 0, 20),
-                        ZIndex = 103,
+                        ZIndex = 2,
                         Parent = Scroll,
                     })
                     Library:AddToRegistry(BoxOuter, { BackgroundColor3 = 'BackgroundColor', BorderColor3 = 'OutlineColor' })
@@ -2284,7 +2294,7 @@ do
                         BorderColor3 = Color3.new(0, 0, 0),
                         Size = UDim2.new(1, -2, 1, -2),
                         Position = UDim2.new(0, 1, 0, 1),
-                        ZIndex = 104,
+                        ZIndex = 3,
                         Parent = BoxOuter,
                     })
                     Library:AddToRegistry(BoxInner, { BackgroundColor3 = 'BackgroundColor' })
@@ -2293,7 +2303,7 @@ do
                         BackgroundColor3 = Library.AccentColor,
                         BorderSizePixel = 0,
                         Size = UDim2.new(1, 0, 0, 2),
-                        ZIndex = 105,
+                        ZIndex = 4,
                         Parent = BoxInner,
                     })
 
@@ -2303,15 +2313,15 @@ do
                         TextSize = 12,
                         Text = GroupName,
                         TextXAlignment = Enum.TextXAlignment.Left,
-                        ZIndex = 105,
+                        ZIndex = 4,
                         Parent = BoxInner,
                     })
 
                     local Container = Library:Create('Frame', {
                         BackgroundTransparency = 1,
                         Position = UDim2.new(0, 4, 0, 20),
-                        Size = UDim2.new(1, -4, 0, 0), -- pure offset Y, updated by Resize
-                        ZIndex = 104,
+                        Size = UDim2.new(1, -4, 0, 0),
+                        ZIndex = 4,
                         Parent = BoxInner,
                     })
                     Library:Create('UIListLayout', {
@@ -2319,6 +2329,7 @@ do
                         SortOrder = Enum.SortOrder.LayoutOrder,
                         Parent = Container,
                     })
+
 
                     function GBox:Resize()
                         local H = 0
