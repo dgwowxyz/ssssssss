@@ -2104,7 +2104,7 @@ do
                 BackgroundColor3 = Color3.new(0, 0, 0),
                 BorderColor3 = Color3.new(0, 0, 0),
                 Position = UDim2.fromOffset(200, 150),
-                Size = UDim2.fromOffset(265, 300),
+                Size = UDim2.fromOffset(269, 300),
                 Visible = false,
                 ZIndex = 1,
                 Parent = PropsGui,
@@ -2181,12 +2181,11 @@ do
             local function startCapture()
                 if popupCaptureConn then return end
                 popupCaptureConn = ScreenGui.ChildAdded:Connect(function(child)
-                    task.defer(function()
-                        -- Only reroute if this props window is the active one
-                        if SubOuter.Visible and child and child.Parent == ScreenGui then
-                            child.Parent = PropsGui
-                        end
-                    end)
+                    -- Immediately reparent dropdown/colorpicker popups to PropsGui
+                    -- so they appear above the properties window (not hidden behind it)
+                    if SubOuter.Visible and child.Parent == ScreenGui then
+                        child.Parent = PropsGui
+                    end
                 end)
             end
 
