@@ -1446,7 +1446,7 @@ do
 
     BaseAddons.__index = Funcs;
     BaseAddons.__namecall = function(Table, Key, ...)
-        return Funcs[Key](...);
+        return Funcs[Key](Table, ...);
     end;
 end;
 
@@ -3198,7 +3198,7 @@ do
 
     BaseGroupbox.__index = Funcs;
     BaseGroupbox.__namecall = function(Table, Key, ...)
-        return Funcs[Key](...);
+        return Funcs[Key](Table, ...);
     end;
 end;
 
