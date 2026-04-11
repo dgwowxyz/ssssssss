@@ -1212,9 +1212,13 @@ do
                 end
             elseif Library.KeybindFrame.Visible then
                 if Fader then
-                    local Tween = TweenService:Create(Fader, TweenInfo.new(Library.TweenTime, Library.TweenStyle, Enum.EasingDirection.Out), { BackgroundTransparency = 0 });
-                    Tween:Play();
-                    Tween.Completed:Connect(function()
+                    local SizeTween = TweenService:Create(Library.KeybindFrame, TweenInfo.new(Library.TweenTime, Library.TweenStyle, Enum.EasingDirection.Out), { Size = TargetSize });
+                    local FadeTween = TweenService:Create(Fader, TweenInfo.new(Library.TweenTime, Library.TweenStyle, Enum.EasingDirection.Out), { BackgroundTransparency = 0 });
+                    
+                    SizeTween:Play();
+                    FadeTween:Play();
+                    
+                    FadeTween.Completed:Connect(function()
                         if not (Library.KeybindContainer:FindFirstChildOfClass('TextLabel') and Library.KeybindContainer:FindFirstChildOfClass('TextLabel').Visible) then
                             Library.KeybindFrame.Visible = false;
                         end
