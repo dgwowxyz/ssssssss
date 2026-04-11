@@ -1446,7 +1446,7 @@ do
 
     BaseAddons.__index = Funcs;
     BaseAddons.__namecall = function(Table, Key, ...)
-        return Funcs[Key](Table, ...);
+        return Funcs[Key](...);
     end;
 end;
 
@@ -2090,7 +2090,6 @@ do
                 Position = UDim2.new(0, 1, 0, 1),
                 Size = UDim2.new(1, -2, 1, -2),
                 Image = 'rbxassetid://4492476134',
-                ImageColor3 = Library.MiscColor,
                 ZIndex = 9,
                 Parent = IconWrapper,
             })
@@ -2192,25 +2191,13 @@ do
             end
 
             local popupCaptureConn = nil
-            local signalConn = nil
-
-            local function stopCapture()
-                if popupCaptureConn then
-                    popupCaptureConn:Disconnect()
-                    popupCaptureConn = nil
-                end
-                if signalConn then
-                    signalConn:Disconnect()
-                    signalConn = nil
-                end
-            end
 
             local function startCapture()
                 if popupCaptureConn then return end
                 popupCaptureConn = ScreenGui.ChildAdded:Connect(function(child)
                     if SubOuter.Visible then
                         task.defer(function()
-                            if child.Parent == ScreenGui and child.Name == 'Color' then
+                            if child.Parent == ScreenGui then
                                 child.Parent = PropsGui
                             end
                         end)
@@ -2218,20 +2205,33 @@ do
                 end)
 
                 -- Listen for property changes on ScreenGui as a signal to re-check popups
-                signalConn = ScreenGui:GetPropertyChangedSignal("Name"):Connect(function()
+                local signalConn = ScreenGui:GetPropertyChangedSignal("Name"):Connect(function()
                     if SubOuter.Visible then
                         for _, child in next, ScreenGui:GetChildren() do
-                            if child.Name == 'Color' then
+                            if child.Name == 'Color' or (child:IsA('Frame') and child.ZIndex >= 100) then
                                 child.Parent = PropsGui
                             end
                         end
                     end
                 end)
-
+                
                 for _, child in next, ScreenGui:GetChildren() do
-                    if child.Name == 'Color' then
+                    if child.Name == 'Color' or (child:IsA('Frame') and child.ZIndex >= 100) then
                         child.Parent = PropsGui
                     end
+                end
+
+                local oldStop = stopCapture
+                stopCapture = function()
+                    if signalConn then signalConn:Disconnect() end
+                    oldStop()
+                end
+            end
+
+            local function stopCapture()
+                if popupCaptureConn then
+                    popupCaptureConn:Disconnect()
+                    popupCaptureConn = nil
                 end
             end
 
@@ -3198,7 +3198,7 @@ do
 
     BaseGroupbox.__index = Funcs;
     BaseGroupbox.__namecall = function(Table, Key, ...)
-        return Funcs[Key](Table, ...);
+        return Funcs[Key](...);
     end;
 end;
 
