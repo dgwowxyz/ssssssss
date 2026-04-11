@@ -1193,8 +1193,25 @@ do
                 end;
             end;
 
-            Library.KeybindFrame.Size = UDim2.new(0, math.max(XSize + 10, 210), 0, YSize + 23)
-            Library.KeybindFrame.Visible = (YSize > 0);
+            local TargetSize = UDim2.new(0, math.max(XSize + 10, 210), 0, YSize + 23)
+            Library.KeybindFrame.Size = TargetSize
+
+            local ShouldBeVisible = (YSize > 0);
+            if ShouldBeVisible ~= Library.KeybindFrame.Visible then
+                if ShouldBeVisible then
+                    Library.KeybindFrame.Visible = true;
+                    Library.KeybindFrame.Position = UDim2.new(0, -250, 0.5, 0);
+                    TweenService:Create(Library.KeybindFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), { Position = UDim2.new(0, 10, 0.5, 0) }):Play();
+                else
+                    local Tween = TweenService:Create(Library.KeybindFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), { Position = UDim2.new(0, -250, 0.5, 0) });
+                    Tween:Play();
+                    Tween.Completed:Connect(function()
+                        if not (Library.KeybindContainer:FindFirstChildOfClass('TextLabel') and Library.KeybindContainer:FindFirstChildOfClass('TextLabel').Visible) then
+                            Library.KeybindFrame.Visible = false;
+                        end
+                    end);
+                end
+            end
 
             DisplayLabel.TextColor3 = (KeyPicker.Value ~= 'None') and Library.AccentColor or Library.FontColor;
             Library.RegistryMap[DisplayLabel].Properties.TextColor3 = (KeyPicker.Value ~= 'None') and 'AccentColor' or 'FontColor';
@@ -2829,10 +2846,14 @@ do
         Position = UDim2.fromOffset(5, 2),
         TextXAlignment = Enum.TextXAlignment.Left,
 
-        Text = 'Keybinds';
+        Text = 'keybinds';
+        TextSize = 12;
+        Font = Library.Font;
         ZIndex = 104;
         Parent = KeybindInner;
     });
+
+    Library:ApplyTextStroke(KeybindLabel);
 
     local KeybindContainer = Library:Create('Frame', {
         BackgroundTransparency = 1;
