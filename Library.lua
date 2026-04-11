@@ -179,10 +179,9 @@ function Library:MakeDraggable(Instance, Cutoff)
 
     Instance.InputBegan:Connect(function(Input)
         if Input.UserInputType == Enum.UserInputType.MouseButton1 then
-            local MousePos = InputService:GetMouseLocation();
             local ObjPos = Vector2.new(
-                MousePos.X - Instance.AbsolutePosition.X,
-                MousePos.Y - Instance.AbsolutePosition.Y
+                Mouse.X - Instance.AbsolutePosition.X,
+                Mouse.Y - Instance.AbsolutePosition.Y
             );
 
             if ObjPos.Y > (Cutoff or 40) then
@@ -190,12 +189,11 @@ function Library:MakeDraggable(Instance, Cutoff)
             end;
 
             while InputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton1) do
-                local mPos = InputService:GetMouseLocation();
                 local TargetPos = UDim2.new(
                     0,
-                    mPos.X - ObjPos.X,
+                    Mouse.X - ObjPos.X,
                     0,
-                    mPos.Y - ObjPos.Y
+                    Mouse.Y - ObjPos.Y
                 );
 
                 TweenService:Create(Instance, TweenInfo.new(Library.DragTime, Library.TweenStyle, Library.TweenDirection), { Position = TargetPos }):Play();
@@ -3229,37 +3227,18 @@ function Library:CreateWindow(...)
         TextColor3 = 'AccentColor';
     });
 
-    local DateLabel = Library:CreateLabel({
-        Position = UDim2.new(0, 7, 0, 0);
-        Size = UDim2.new(0, 0, 0, 25);
-        Text = '';
-        TextXAlignment = Enum.TextXAlignment.Left;
-        ZIndex = 1;
-        Parent = Inner;
-    });
-
     Window.Title = Config.Title or ''
     Window.Suffix = Config.Suffix
 
     local function updateTitleText()
         WindowLabel.Text = Window.Title
-        
-        local TitleWidth = WindowLabel.TextBounds.X
-        local SuffixWidth = 0
-        
         if Window.Suffix then
             SuffixLabel.Text = Window.Suffix
             SuffixLabel.Visible = true
-            SuffixLabel.Position = UDim2.new(0, 7 + TitleWidth, 0, 0)
-            
-            SuffixWidth = SuffixLabel.TextBounds.X + 7
+            SuffixLabel.Position = UDim2.new(0, 7 + WindowLabel.TextBounds.X, 0, 0)
         else
             SuffixLabel.Visible = false
         end
-
-        DateLabel.Text = os.date("%x")
-        DateLabel.Position = UDim2.new(0, 7 + TitleWidth + SuffixWidth, 0, 0)
-
         return Window.Title
     end
 
@@ -3269,11 +3248,9 @@ function Library:CreateWindow(...)
     })
 
     WindowLabel:GetPropertyChangedSignal('TextBounds'):Connect(function()
-        updateTitleText()
-    end)
-
-    SuffixLabel:GetPropertyChangedSignal('TextBounds'):Connect(function()
-        updateTitleText()
+        if Window.Suffix then
+            SuffixLabel.Position = UDim2.new(0, 7 + WindowLabel.TextBounds.X, 0, 0)
+        end
     end)
 
     updateTitleText()
