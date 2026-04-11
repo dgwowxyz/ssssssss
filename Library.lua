@@ -2851,7 +2851,7 @@ do
     local ColorFrame = Library:Create('Frame', {
         BackgroundColor3 = Library.AccentColor;
         BorderSizePixel = 0;
-        Size = UDim2.new(1, 0, 0, 2);
+        Size = UDim2.new(1, 0, 0, 1);
         ZIndex = 102;
         Parent = KeybindInner;
     });
