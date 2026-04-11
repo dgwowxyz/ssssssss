@@ -168,7 +168,7 @@ function Library:CreateLabel(Properties, IsHud)
 
     Library:AddToRegistry(_Instance, {
         TextColor3 = 'MiscColor';
-        Font = 'Font';
+        FontFace = 'Font';
     }, IsHud);
 
     return Library:Create(_Instance, Properties);
@@ -426,11 +426,27 @@ function Library:UpdateColorsUsingRegistry()
 
     for Idx, Object in next, Library.Registry do
         for Property, ColorIdx in next, Object.Properties do
-            if type(ColorIdx) == 'string' then
-                Object.Instance[Property] = Library[ColorIdx];
-            elseif type(ColorIdx) == 'function' then
+            if type(ColorIdx) == 'function' then
                 local Result = ColorIdx();
-                Object.Instance[Property] = Library[Result] or Result;
+                local Target = Library[Result] or Result;
+
+                if Property == 'Font' and typeof(Target) == 'Font' then
+                    Object.Instance.FontFace = Target;
+                elseif Property == 'FontFace' and typeof(Target) == 'Font' then
+                    Object.Instance.FontFace = Target;
+                else
+                    Object.Instance[Property] = Target;
+                end
+            elseif type(ColorIdx) == 'string' then
+                local Target = Library[ColorIdx];
+
+                if Property == 'Font' and typeof(Target) == 'Font' then
+                    Object.Instance.FontFace = Target;
+                elseif Property == 'FontFace' and typeof(Target) == 'Font' then
+                    Object.Instance.FontFace = Target;
+                else
+                    Object.Instance[Property] = Target;
+                end
             end
         end;
     end;
@@ -3333,10 +3349,7 @@ function Library:CreateWindow(...)
             Parent = TabButton;
         });
 
-        Library:OnHighlight(TabButton, TabButtonLabel,
-            { TextColor3 = function() return TabFrame.Visible and 'AccentColor' or 'FontColor' end },
-            { TextColor3 = function() return TabFrame.Visible and 'AccentColor' or 'MiscColor' end }
-        )
+
 
         local Blocker = Library:Create('Frame', {
             BackgroundColor3 = Library.MainColor;
@@ -3437,6 +3450,11 @@ function Library:CreateWindow(...)
 
             TabFrame.Visible = false;
         end;
+
+        Library:OnHighlight(TabButton, TabButtonLabel,
+            { TextColor3 = function() return TabFrame.Visible and 'AccentColor' or 'FontColor' end },
+            { TextColor3 = function() return TabFrame.Visible and 'AccentColor' or 'MiscColor' end }
+        )
 
         function Tab:SetLayoutOrder(Position)
             TabButton.LayoutOrder = Position;
