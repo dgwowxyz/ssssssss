@@ -536,6 +536,7 @@ do
         -- There was some issue which caused RelativeOffset to be way off
         -- Thus the color picker would never show
 
+        local _ColorPickerPopupParent = self.PopupParent or ScreenGui;
         local PickerFrameOuter = Library:Create('Frame', {
             Name = 'Color';
             BackgroundColor3 = Color3.new(1, 1, 1);
@@ -545,7 +546,7 @@ do
             Visible = false;
             ZIndex = 15;
             Active = true;
-            Parent = ScreenGui,
+            Parent = _ColorPickerPopupParent,
         });
 
         DisplayFrame:GetPropertyChangedSignal('AbsolutePosition'):Connect(function()
@@ -757,7 +758,7 @@ do
                 ZIndex = 14,
 
                 Visible = false,
-                Parent = ScreenGui
+                Parent = _ColorPickerPopupParent
             })
 
             ContextMenu.Inner = Library:Create('Frame', {
@@ -1137,13 +1138,14 @@ do
             Parent = PickInner;
         });
 
+        local _KeyPickerPopupParent = self.PopupParent or ScreenGui;
         local ModeSelectOuter = Library:Create('Frame', {
             BorderColor3 = Color3.new(0, 0, 0);
             Position = UDim2.fromOffset(ToggleLabel.AbsolutePosition.X + ToggleLabel.AbsoluteSize.X + 4, ToggleLabel.AbsolutePosition.Y + 1);
             Size = UDim2.new(0, 60, 0, 45 + 2);
             Visible = false;
             ZIndex = 14;
-            Parent = ScreenGui;
+            Parent = _KeyPickerPopupParent;
         });
 
         ToggleLabel:GetPropertyChangedSignal('AbsolutePosition'):Connect(function()
@@ -1508,6 +1510,7 @@ do
         end
 
         if (not DoesWrap) then
+            Label.PopupParent = Groupbox.PopupParent;
             setmetatable(Label, BaseAddons);
         end
 
@@ -2377,6 +2380,7 @@ do
                     end
 
                     GBox.Container = Container
+                    GBox.PopupParent = PropsGui
                     setmetatable(GBox, BaseGroupbox)
                     GBox:AddBlank(3)
                     GBox:Resize()
@@ -2397,6 +2401,7 @@ do
 
         Toggle.TextLabel = ToggleLabel;
         Toggle.Container = Container;
+        Toggle.PopupParent = self.PopupParent;
         setmetatable(Toggle, BaseAddons);
 
         Toggles[Idx] = Toggle;
@@ -2729,6 +2734,7 @@ do
 
         local MAX_DROPDOWN_ITEMS = 8;
 
+        local _DropdownPopupParent = self.PopupParent or ScreenGui;
         local ListOuter = Library:Create('Frame', {
             BackgroundColor3 = Color3.new(0, 0, 0);
             BorderColor3 = Color3.new(0, 0, 0);
@@ -2736,7 +2742,7 @@ do
             Visible = false;
             ClipsDescendants = true;
             Size = UDim2.fromOffset(0, 0),
-            Parent = ScreenGui;
+            Parent = _DropdownPopupParent;
         });
 
         local function RecalculateListPosition()
