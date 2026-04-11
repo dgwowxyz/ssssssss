@@ -2075,7 +2075,7 @@ do
                 Active = true,
                 BackgroundTransparency = 1,
                 Size = UDim2.new(0, 12, 0, 12),
-                Image = 'rbxassetid://3926305904', -- gear/settings icon
+                Image = 'rbxassetid://4492476134',
                 ImageColor3 = Library.MiscColor,
                 ZIndex = 9,
                 Parent = ToggleLabel
@@ -2263,44 +2263,51 @@ do
                     local GBox = {}
 
                     local BoxOuter = Library:Create('Frame', {
-                        BackgroundColor3 = Color3.new(0, 0, 0),
-                        BorderColor3 = Color3.new(0, 0, 0),
+                        BackgroundColor3 = Library.BackgroundColor,
+                        BorderColor3 = Library.OutlineColor,
+                        BorderMode = Enum.BorderMode.Inset,
                         Size = UDim2.new(1, 0, 0, 20),
                         ZIndex = 103,
                         Parent = Scroll,
                     })
-                    Library:AddToRegistry(BoxOuter, { BorderColor3 = 'Black' })
+                    Library:AddToRegistry(BoxOuter, { BackgroundColor3 = 'BackgroundColor', BorderColor3 = 'OutlineColor' })
 
                     local BoxInner = Library:Create('Frame', {
-                        BackgroundColor3 = Library.MainColor,
-                        BorderColor3 = Library.OutlineColor,
-                        BorderMode = Enum.BorderMode.Inset,
-                        Size = UDim2.new(1, 0, 1, 0),
+                        BackgroundColor3 = Library.BackgroundColor,
+                        BorderColor3 = Color3.new(0, 0, 0),
+                        Size = UDim2.new(1, -2, 1, -2),
+                        Position = UDim2.new(0, 1, 0, 1),
                         ZIndex = 104,
                         Parent = BoxOuter,
                     })
-                    Library:AddToRegistry(BoxInner, { BackgroundColor3 = 'MainColor', BorderColor3 = 'OutlineColor' })
+                    Library:AddToRegistry(BoxInner, { BackgroundColor3 = 'BackgroundColor' })
 
-                    local BoxLabel = Library:CreateLabel({
-                        Size = UDim2.new(0, 0, 0, 14),
-                        Position = UDim2.new(0, 10, 0, -2),
-                        BackgroundColor3 = Library.MainColor,
-                        Text = GroupName,
-                        TextSize = 12,
-                        ZIndex = 106,
+                    Library:Create('Frame', {
+                        BackgroundColor3 = Library.AccentColor,
+                        BorderSizePixel = 0,
+                        Size = UDim2.new(1, 0, 0, 2),
+                        ZIndex = 105,
                         Parent = BoxInner,
                     })
-                    Library:AddToRegistry(BoxLabel, { BackgroundColor3 = 'MainColor' })
+
+                    Library:CreateLabel({
+                        Size = UDim2.new(1, 0, 0, 18),
+                        Position = UDim2.new(0, 4, 0, 2),
+                        TextSize = 12,
+                        Text = GroupName,
+                        TextXAlignment = Enum.TextXAlignment.Left,
+                        ZIndex = 105,
+                        Parent = BoxInner,
+                    })
 
                     local Container = Library:Create('Frame', {
                         BackgroundTransparency = 1,
-                        Position = UDim2.new(0, 8, 0, 12),
-                        Size = UDim2.new(1, -16, 1, -12),
+                        Position = UDim2.new(0, 4, 0, 20),
+                        Size = UDim2.new(1, -4, 1, -20),
                         ZIndex = 104,
                         Parent = BoxInner,
                     })
                     Library:Create('UIListLayout', {
-                        Padding = UDim.new(0, 0),
                         FillDirection = Enum.FillDirection.Vertical,
                         SortOrder = Enum.SortOrder.LayoutOrder,
                         Parent = Container,
@@ -2309,9 +2316,11 @@ do
                     function GBox:Resize()
                         local H = 0
                         for _, c in next, Container:GetChildren() do
-                            if not c:IsA('UIListLayout') then H = H + c.Size.Y.Offset end
+                            if not c:IsA('UIListLayout') and c.Visible then
+                                H = H + c.Size.Y.Offset
+                            end
                         end
-                        BoxOuter.Size = UDim2.new(1, 0, 0, H + 15)
+                        BoxOuter.Size = UDim2.new(1, 0, 0, 20 + H + 4)
                     end
 
                     GBox.Container = Container
@@ -2320,6 +2329,7 @@ do
                     GBox:Resize()
                     return GBox
                 end
+
 
                 return TabObj
             end
