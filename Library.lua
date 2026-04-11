@@ -30,10 +30,11 @@ local Library = {
     HudRegistry = {};
 
     FontColor = Color3.fromRGB(255, 255, 255);
-    MainColor = Color3.fromRGB(28, 28, 28);
-    BackgroundColor = Color3.fromRGB(20, 20, 20);
-    AccentColor = Color3.fromRGB(0, 85, 255);
-    OutlineColor = Color3.fromRGB(50, 50, 50);
+    MiscColor = Color3.fromRGB(160, 160, 160);
+    MainColor = Color3.fromRGB(26, 26, 26);
+    BackgroundColor = Color3.fromRGB(27, 27, 27);
+    AccentColor = Color3.fromRGB(189, 140, 140);
+    OutlineColor = Color3.fromRGB(55, 55, 55);
     RiskColor = Color3.fromRGB(255, 50, 50),
 
     Black = Color3.new(0, 0, 0);
@@ -156,7 +157,7 @@ function Library:CreateLabel(Properties, IsHud)
     local _Instance = Library:Create('TextLabel', {
         BackgroundTransparency = 1;
         Font = Library.Font;
-        TextColor3 = Library.FontColor;
+        TextColor3 = Library.MiscColor;
         TextSize = 12;
         TextStrokeTransparency = 0;
     });
@@ -164,7 +165,7 @@ function Library:CreateLabel(Properties, IsHud)
     Library:ApplyTextStroke(_Instance);
 
     Library:AddToRegistry(_Instance, {
-        TextColor3 = 'FontColor';
+        TextColor3 = 'MiscColor';
         FontFace = 'Font';
     }, IsHud);
 
@@ -398,7 +399,8 @@ function Library:UpdateColorsUsingRegistry()
             if type(ColorIdx) == 'string' then
                 Object.Instance[Property] = Library[ColorIdx];
             elseif type(ColorIdx) == 'function' then
-                Object.Instance[Property] = ColorIdx()
+                local res = ColorIdx()
+                Object.Instance[Property] = Library[res] or res
             end
         end;
     end;
@@ -1230,8 +1232,8 @@ do
                 end
             end
 
-            DisplayLabel.TextColor3 = (KeyPicker.Value ~= 'None') and Library.AccentColor or Library.FontColor;
-            Library.RegistryMap[DisplayLabel].Properties.TextColor3 = (KeyPicker.Value ~= 'None') and 'AccentColor' or 'FontColor';
+            DisplayLabel.TextColor3 = (KeyPicker.Value ~= 'None') and Library.AccentColor or Library.MiscColor;
+            Library.RegistryMap[DisplayLabel].Properties.TextColor3 = (KeyPicker.Value ~= 'None') and 'AccentColor' or 'MiscColor';
         end;
 
         function KeyPicker:GetState()
@@ -1534,6 +1536,11 @@ do
                 { BorderColor3 = 'Black' }
             );
 
+            Library:OnHighlight(Outer, Label,
+                { TextColor3 = 'FontColor' },
+                { TextColor3 = 'MiscColor' }
+            );
+
             return Outer, Inner, Label
         end
 
@@ -1582,9 +1589,9 @@ do
                     local clicked = WaitForEvent(Button.Outer.InputBegan, 0.5, ValidateClick)
 
                     Library:RemoveFromRegistry(Button.Label)
-                    Library:AddToRegistry(Button.Label, { TextColor3 = 'FontColor' })
+                    Library:AddToRegistry(Button.Label, { TextColor3 = 'MiscColor' })
 
-                    Button.Label.TextColor3 = Library.FontColor
+                    Button.Label.TextColor3 = Library.MiscColor
                     Button.Label.Text = Button.Text
                     task.defer(rawset, Button, 'Locked', false)
 
@@ -1739,6 +1746,11 @@ do
         Library:OnHighlight(TextBoxOuter, TextBoxOuter,
             { BorderColor3 = 'AccentColor' },
             { BorderColor3 = 'Black' }
+        );
+
+        Library:OnHighlight(TextBoxOuter, InputLabel,
+            { TextColor3 = 'FontColor' },
+            { TextColor3 = 'MiscColor' }
         );
 
         if type(Info.Tooltip) == 'string' then
@@ -1945,6 +1957,11 @@ do
             { BorderColor3 = 'Black' }
         );
 
+        Library:OnHighlight(ToggleRegion, ToggleLabel,
+            { TextColor3 = function() return Toggle.Value and 'AccentColor' or 'FontColor' end },
+            { TextColor3 = function() return Toggle.Value and 'AccentColor' or 'MiscColor' end }
+        );
+
         function Toggle:UpdateColors()
             Toggle:Display();
         end;
@@ -1960,8 +1977,8 @@ do
             Library.RegistryMap[ToggleInner].Properties.BackgroundColor3 = Toggle.Value and 'AccentColor' or 'MainColor';
             Library.RegistryMap[ToggleInner].Properties.BorderColor3 = Toggle.Value and 'AccentColorDark' or 'OutlineColor';
 
-            ToggleLabel.TextColor3 = Toggle.Value and Library.AccentColor or Library.FontColor;
-            Library.RegistryMap[ToggleLabel].Properties.TextColor3 = Toggle.Value and 'AccentColor' or 'FontColor';
+            ToggleLabel.TextColor3 = Toggle.Value and Library.AccentColor or Library.MiscColor;
+            Library.RegistryMap[ToggleLabel].Properties.TextColor3 = Toggle.Value and 'AccentColor' or 'MiscColor';
         end;
 
         function Toggle:OnChanged(Func)
@@ -2112,6 +2129,11 @@ do
         Library:OnHighlight(SliderOuter, SliderOuter,
             { BorderColor3 = 'AccentColor' },
             { BorderColor3 = 'Black' }
+        );
+
+        Library:OnHighlight(SliderOuter, DisplayLabel,
+            { TextColor3 = 'FontColor' },
+            { TextColor3 = 'MiscColor' }
         );
 
         if type(Info.Tooltip) == 'string' then
@@ -2320,6 +2342,11 @@ do
         Library:OnHighlight(DropdownOuter, DropdownOuter,
             { BorderColor3 = 'AccentColor' },
             { BorderColor3 = 'Black' }
+        );
+
+        Library:OnHighlight(DropdownOuter, ItemList,
+            { TextColor3 = 'FontColor' },
+            { TextColor3 = 'MiscColor' }
         );
 
         if type(Info.Tooltip) == 'string' then
