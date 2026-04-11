@@ -527,6 +527,7 @@ do
             Size = UDim2.fromOffset(230, Info.Transparency and 271 or 253);
             Visible = false;
             ZIndex = 15;
+            Active = true;
             Parent = ScreenGui,
         });
 
@@ -565,6 +566,7 @@ do
             BorderMode = Enum.BorderMode.Inset;
             Size = UDim2.new(1, 0, 1, 0);
             ZIndex = 18;
+            Active = true;
             Parent = SatVibMapOuter;
         });
 
@@ -608,6 +610,7 @@ do
             BorderSizePixel = 0;
             Size = UDim2.new(1, 0, 1, 0);
             ZIndex = 18;
+            Active = true;
             Parent = HueSelectorOuter;
         });
 
@@ -693,6 +696,7 @@ do
                 BorderMode = Enum.BorderMode.Inset;
                 Size = UDim2.new(1, 0, 1, 0);
                 ZIndex = 19;
+                Active = true;
                 Parent = TransparencyBoxOuter;
             });
 
@@ -3330,8 +3334,8 @@ function Library:CreateWindow(...)
         });
 
         Library:OnHighlight(TabButton, TabButtonLabel,
-            { TextColor3 = function() return Window.Tabs[Name] == Tab and 'AccentColor' or 'FontColor' end },
-            { TextColor3 = function() return Window.Tabs[Name] == Tab and 'AccentColor' or 'MiscColor' end }
+            { TextColor3 = function() return TabFrame.Visible and 'AccentColor' or 'FontColor' end },
+            { TextColor3 = function() return TabFrame.Visible and 'AccentColor' or 'MiscColor' end }
         )
 
         local Blocker = Library:Create('Frame', {
@@ -3622,8 +3626,8 @@ function Library:CreateWindow(...)
                 });
 
                 Library:OnHighlight(Button, ButtonLabel,
-                    { TextColor3 = function() return Tabbox.Tabs[Name] == Tab and 'AccentColor' or 'FontColor' end },
-                    { TextColor3 = function() return Tabbox.Tabs[Name] == Tab and 'AccentColor' or 'MiscColor' end }
+                    { TextColor3 = function() return Container.Visible and 'AccentColor' or 'FontColor' end },
+                    { TextColor3 = function() return Container.Visible and 'AccentColor' or 'MiscColor' end }
                 )
 
                 local Block = Library:Create('Frame', {
