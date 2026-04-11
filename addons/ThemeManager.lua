@@ -4,9 +4,9 @@ local ThemeManager = {} do
 	-- if not isfolder(ThemeManager.Folder) then makefolder(ThemeManager.Folder) end
 
 	ThemeManager.Library = nil
-	ThemeManager.DefaultTheme = 'Headshot'
+	ThemeManager.DefaultTheme = 'headshot'
 	ThemeManager.BuiltInThemes = {
-		['headshot'] 		= { 1, httpService:JSONDecode('{"FontColor":"ffffff","MiscColor":"cfcfcf","MainColor":"1a1a1a","AccentColor":"bd8c8c","BackgroundColor":"1b1b1b","OutlineColor":"373737"}') },
+		['headshot'] 		= { 1, httpService:JSONDecode('{"FontColor":"ffffff","MiscColor":"ffffff","MainColor":"1c1c1c","AccentColor":"ac63ed","BackgroundColor":"181818","OutlineColor":"363636"}') },
 		['linoria'] 		= { 2, httpService:JSONDecode('{"FontColor":"ffffff","MiscColor":"cfcfcf","MainColor":"1c1c1c","AccentColor":"0055ff","BackgroundColor":"141414","OutlineColor":"323232"}') },
 		['bitch bot'] 	    = { 3, httpService:JSONDecode('{"FontColor":"ffffff","MiscColor":"cfcfcf","MainColor":"1e1e1e","AccentColor":"7e48a3","BackgroundColor":"232323","OutlineColor":"141414"}') },
 		['fatality']		= { 4, httpService:JSONDecode('{"FontColor":"ffffff","MiscColor":"cfcfcf","MainColor":"1e1842","AccentColor":"c50754","BackgroundColor":"191335","OutlineColor":"3c355d"}') },
