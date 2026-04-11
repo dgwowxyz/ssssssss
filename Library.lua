@@ -2167,20 +2167,25 @@ do
             Library:MakeDraggable(SubOuter)
 
 
-            -- Click on wrapper frame to toggle window
+            -- Click icon to open/close — uses its own tracking table,
+            -- NOT OpenedFrames (which would block all clicks inside via MouseIsOverOpenedFrame)
+            if not Library.OpenedPropertyWindows then
+                Library.OpenedPropertyWindows = {}
+            end
+
             IconWrapper.InputBegan:Connect(function(Input)
                 if Input.UserInputType ~= Enum.UserInputType.MouseButton1 then return end
                 SubOuter.Visible = not SubOuter.Visible
                 if SubOuter.Visible then
-                    for Frame in next, Library.OpenedFrames do
-                        if Frame ~= SubOuter then
-                            Frame.Visible = false
-                            Library.OpenedFrames[Frame] = nil
+                    -- close any other open property windows
+                    for _, w in next, Library.OpenedPropertyWindows do
+                        if w ~= SubOuter then
+                            w.Visible = false
                         end
                     end
-                    Library.OpenedFrames[SubOuter] = true
+                    Library.OpenedPropertyWindows[Info.Text] = SubOuter
                 else
-                    Library.OpenedFrames[SubOuter] = nil
+                    Library.OpenedPropertyWindows[Info.Text] = nil
                 end
             end)
 
