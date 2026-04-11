@@ -3229,18 +3229,37 @@ function Library:CreateWindow(...)
         TextColor3 = 'AccentColor';
     });
 
+    local DateLabel = Library:CreateLabel({
+        Position = UDim2.new(0, 7, 0, 0);
+        Size = UDim2.new(0, 0, 0, 25);
+        Text = '';
+        TextXAlignment = Enum.TextXAlignment.Left;
+        ZIndex = 1;
+        Parent = Inner;
+    });
+
     Window.Title = Config.Title or ''
     Window.Suffix = Config.Suffix
 
     local function updateTitleText()
         WindowLabel.Text = Window.Title
+        
+        local TitleWidth = WindowLabel.TextBounds.X
+        local SuffixWidth = 0
+        
         if Window.Suffix then
             SuffixLabel.Text = Window.Suffix
             SuffixLabel.Visible = true
-            SuffixLabel.Position = UDim2.new(0, 7 + WindowLabel.TextBounds.X, 0, 0)
+            SuffixLabel.Position = UDim2.new(0, 7 + TitleWidth, 0, 0)
+            
+            SuffixWidth = SuffixLabel.TextBounds.X + 7
         else
             SuffixLabel.Visible = false
         end
+
+        DateLabel.Text = os.date("%x")
+        DateLabel.Position = UDim2.new(0, 7 + TitleWidth + SuffixWidth, 0, 0)
+
         return Window.Title
     end
 
@@ -3250,9 +3269,11 @@ function Library:CreateWindow(...)
     })
 
     WindowLabel:GetPropertyChangedSignal('TextBounds'):Connect(function()
-        if Window.Suffix then
-            SuffixLabel.Position = UDim2.new(0, 7 + WindowLabel.TextBounds.X, 0, 0)
-        end
+        updateTitleText()
+    end)
+
+    SuffixLabel:GetPropertyChangedSignal('TextBounds'):Connect(function()
+        updateTitleText()
     end)
 
     updateTitleText()
