@@ -39,6 +39,9 @@ local Library = {
     Black = Color3.new(0, 0, 0);
     Font = Enum.Font.Code,
 
+    TweenStyle = Enum.EasingStyle.Linear,
+    TweenTime = 0.15,
+
     OpenedFrames = {};
     DependencyBoxes = {};
 
@@ -160,6 +163,7 @@ function Library:CreateLabel(Properties, IsHud)
 
     Library:AddToRegistry(_Instance, {
         TextColor3 = 'FontColor';
+        FontFace = 'Font';
     }, IsHud);
 
     return Library:Create(_Instance, Properties);
@@ -187,7 +191,7 @@ function Library:MakeDraggable(Instance, Cutoff)
                     Mouse.Y - ObjPos.Y + (Instance.Size.Y.Offset * Instance.AnchorPoint.Y)
                 );
 
-                TweenService:Create(Instance, TweenInfo.new(0.08, Enum.EasingStyle.Linear, Enum.EasingDirection.Out), { Position = TargetPos }):Play();
+                TweenService:Create(Instance, TweenInfo.new(Library.TweenTime, Library.TweenStyle, Enum.EasingDirection.Out), { Position = TargetPos }):Play();
 
                 RenderStepped:Wait();
             end;
@@ -1196,7 +1200,7 @@ do
             end;
 
             local TargetSize = UDim2.new(0, math.max(XSize + 10, 210), 0, YSize + 23)
-            TweenService:Create(Library.KeybindFrame, TweenInfo.new(0.15, Enum.EasingStyle.Linear, Enum.EasingDirection.Out), { Size = TargetSize }):Play();
+            TweenService:Create(Library.KeybindFrame, TweenInfo.new(Library.TweenTime, Library.TweenStyle, Enum.EasingDirection.Out), { Size = TargetSize }):Play();
 
             local ShouldBeVisible = (YSize > 0);
             if ShouldBeVisible ~= Library.KeybindFrame.Visible then
@@ -1206,11 +1210,11 @@ do
                     Library.KeybindFrame.Visible = true;
                     if Fader then
                         Fader.BackgroundTransparency = 0;
-                        TweenService:Create(Fader, TweenInfo.new(0.15, Enum.EasingStyle.Linear, Enum.EasingDirection.Out), { BackgroundTransparency = 1 }):Play();
+                        TweenService:Create(Fader, TweenInfo.new(Library.TweenTime, Library.TweenStyle, Enum.EasingDirection.Out), { BackgroundTransparency = 1 }):Play();
                     end
                 else
                     if Fader then
-                        local Tween = TweenService:Create(Fader, TweenInfo.new(0.15, Enum.EasingStyle.Linear, Enum.EasingDirection.Out), { BackgroundTransparency = 0 });
+                        local Tween = TweenService:Create(Fader, TweenInfo.new(Library.TweenTime, Library.TweenStyle, Enum.EasingDirection.Out), { BackgroundTransparency = 0 });
                         Tween:Play();
                         Tween.Completed:Connect(function()
                             if not (Library.KeybindContainer:FindFirstChildOfClass('TextLabel') and Library.KeybindContainer:FindFirstChildOfClass('TextLabel').Visible) then
@@ -3318,7 +3322,7 @@ function Library:CreateWindow(...)
             TabFrame.Visible = true;
             Fader.BackgroundTransparency = 0;
 
-            TweenService:Create(Fader, TweenInfo.new(0.15, Enum.EasingStyle.Linear, Enum.EasingDirection.Out), { BackgroundTransparency = 1 }):Play();
+            TweenService:Create(Fader, TweenInfo.new(Library.TweenTime, Library.TweenStyle, Enum.EasingDirection.Out), { BackgroundTransparency = 1 }):Play();
         end;
 
         function Tab:HideTab()
@@ -3331,7 +3335,7 @@ function Library:CreateWindow(...)
 
             if TabFrame.Visible then
                 Fader.BackgroundTransparency = 1;
-                local Tween = TweenService:Create(Fader, TweenInfo.new(0.15, Enum.EasingStyle.Linear, Enum.EasingDirection.Out), { BackgroundTransparency = 0 });
+                local Tween = TweenService:Create(Fader, TweenInfo.new(Library.TweenTime, Library.TweenStyle, Enum.EasingDirection.Out), { BackgroundTransparency = 0 });
                 
                 Tween:Play();
                 Tween.Completed:Connect(function()
@@ -3727,6 +3731,10 @@ function Library:CreateWindow(...)
         end;
 
         for _, Desc in next, Outer:GetDescendants() do
+            if Desc.Name == 'Fader' then
+                continue;
+            end;
+
             local Properties = {};
 
             if Desc:IsA('ImageLabel') then
@@ -3756,7 +3764,7 @@ function Library:CreateWindow(...)
                     continue;
                 end;
 
-                TweenService:Create(Desc, TweenInfo.new(FadeTime, Enum.EasingStyle.Linear), { [Prop] = Toggled and Cache[Prop] or 1 }):Play();
+                TweenService:Create(Desc, TweenInfo.new(Library.TweenTime, Library.TweenStyle, Enum.EasingDirection.Out), { [Prop] = Toggled and Cache[Prop] or 1 }):Play();
             end;
         end;
 
