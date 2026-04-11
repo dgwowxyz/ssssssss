@@ -959,6 +959,10 @@ do
 
             PickerFrameOuter.Visible = true;
             Library.OpenedFrames[PickerFrameOuter] = true;
+
+            -- Signal for Property windows to capture this popup
+            Library.ScreenGui.Name = "CapturedPopup"
+            Library.ScreenGui.Name = "ScreenGui"
         end;
 
         function ColorPicker:Hide()
@@ -2130,9 +2134,18 @@ do
             })
             Library:AddToRegistry(TitleBar, { BackgroundColor3 = 'BackgroundColor', BorderColor3 = 'OutlineColor' })
 
+            Library:Create('ImageLabel', {
+                BackgroundTransparency = 1,
+                Position = UDim2.new(0, 4, 0, 4),
+                Size = UDim2.new(0, 14, 0, 14),
+                Image = 'rbxassetid://4492476134',
+                ZIndex = 4,
+                Parent = TitleBar,
+            })
+
             Library:CreateLabel({
-                Position = UDim2.new(0, 6, 0, 0),
-                Size = UDim2.new(1, -6, 1, 0),
+                Position = UDim2.new(0, 22, 0, 0),
+                Size = UDim2.new(1, -22, 1, 0),
                 Text = Info.Text .. ' - properties',
                 TextXAlignment = Enum.TextXAlignment.Left,
                 ZIndex = 4,
@@ -2189,11 +2202,28 @@ do
                         end)
                     end
                 end)
+
+                -- Listen for property changes on ScreenGui as a signal to re-check popups
+                local signalConn = ScreenGui:GetPropertyChangedSignal("Name"):Connect(function()
+                    if SubOuter.Visible then
+                        for _, child in next, ScreenGui:GetChildren() do
+                            if child.Name == 'Color' or (child:IsA('Frame') and child.ZIndex >= 100) then
+                                child.Parent = PropsGui
+                            end
+                        end
+                    end
+                end)
                 
                 for _, child in next, ScreenGui:GetChildren() do
                     if child.Name == 'Color' or (child:IsA('Frame') and child.ZIndex >= 100) then
                         child.Parent = PropsGui
                     end
+                end
+
+                local oldStop = stopCapture
+                stopCapture = function()
+                    if signalConn then signalConn:Disconnect() end
+                    oldStop()
                 end
             end
 
@@ -2973,6 +3003,10 @@ do
 
             local Y = math.clamp(Count * 20, 0, MAX_DROPDOWN_ITEMS * 20) + 1;
             Library:TweenProperty(ListOuter, 'Size', UDim2.fromOffset(DropdownOuter.AbsoluteSize.X, Y))
+
+            -- Signal for Property windows to capture this popup
+            Library.ScreenGui.Name = "CapturedPopup"
+            Library.ScreenGui.Name = "ScreenGui"
         end;
 
         function Dropdown:CloseDropdown()
