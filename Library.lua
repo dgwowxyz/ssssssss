@@ -30,6 +30,7 @@ local Library = {
     HudRegistry = {};
 
     FontColor = Color3.fromRGB(255, 255, 255);
+    MiscColor = Color3.fromRGB(160, 160, 160);
     MainColor = Color3.fromRGB(26, 26, 26);
     BackgroundColor = Color3.fromRGB(27, 27, 27);
     AccentColor = Color3.fromRGB(189, 140, 140);
@@ -38,6 +39,8 @@ local Library = {
 
     Black = Color3.new(0, 0, 0);
     Font = Enum.Font.Code,
+
+    ActiveTweens = {};
 
     TweenStyle = Enum.EasingStyle.Back,
     TweenDirection = Enum.EasingDirection.Out,
@@ -156,7 +159,7 @@ function Library:CreateLabel(Properties, IsHud)
     local _Instance = Library:Create('TextLabel', {
         BackgroundTransparency = 1;
         Font = Library.Font;
-        TextColor3 = Library.FontColor;
+        TextColor3 = Library.MiscColor;
         TextSize = 12;
         TextStrokeTransparency = 0;
     });
@@ -164,7 +167,7 @@ function Library:CreateLabel(Properties, IsHud)
     Library:ApplyTextStroke(_Instance);
 
     Library:AddToRegistry(_Instance, {
-        TextColor3 = 'FontColor';
+        TextColor3 = 'MiscColor';
         FontFace = 'Font';
     }, IsHud);
 
@@ -264,7 +267,14 @@ function Library:OnHighlight(HighlightInstance, Instance, Properties, Properties
         local Reg = Library.RegistryMap[Instance];
 
         for Property, ColorIdx in next, Properties do
-            Instance[Property] = Library[ColorIdx] or ColorIdx;
+            local Target = Library[ColorIdx] or ColorIdx;
+
+            if type(Target) == 'function' then
+                Target = Target()
+                Target = Library[Target] or Target
+            end
+
+            Library:TweenProperty(Instance, Property, Target)
 
             if Reg and Reg.Properties[Property] then
                 Reg.Properties[Property] = ColorIdx;
@@ -276,7 +286,14 @@ function Library:OnHighlight(HighlightInstance, Instance, Properties, Properties
         local Reg = Library.RegistryMap[Instance];
 
         for Property, ColorIdx in next, PropertiesDefault do
-            Instance[Property] = Library[ColorIdx] or ColorIdx;
+            local Target = Library[ColorIdx] or ColorIdx;
+
+            if type(Target) == 'function' then
+                Target = Target()
+                Target = Library[Target] or Target
+            end
+
+            Library:TweenProperty(Instance, Property, Target)
 
             if Reg and Reg.Properties[Property] then
                 Reg.Properties[Property] = ColorIdx;
@@ -345,6 +362,20 @@ function Library:GetDarkerColor(Color)
     return Color3.fromHSV(H, S, V / 1.5);
 end;
 Library.AccentColorDark = Library:GetDarkerColor(Library.AccentColor);
+
+function Library:TweenProperty(Instance, Property, TargetValue, Duration)
+    Library.ActiveTweens[Instance] = Library.ActiveTweens[Instance] or {}
+    
+    if Library.ActiveTweens[Instance][Property] then
+        Library.ActiveTweens[Instance][Property]:Cancel()
+    end
+    
+    local Tween = TweenService:Create(Instance, TweenInfo.new(Duration or Library.TweenTime, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), { [Property] = TargetValue })
+    Library.ActiveTweens[Instance][Property] = Tween
+    Tween:Play()
+    
+    return Tween
+end
 
 function Library:AddToRegistry(Instance, Properties, IsHud)
     local Idx = #Library.Registry + 1;
@@ -1534,6 +1565,11 @@ do
                 { BorderColor3 = 'Black' }
             );
 
+            Library:OnHighlight(Outer, Label,
+                { TextColor3 = 'FontColor' },
+                { TextColor3 = 'MiscColor' }
+            );
+
             return Outer, Inner, Label
         end
 
@@ -1582,9 +1618,9 @@ do
                     local clicked = WaitForEvent(Button.Outer.InputBegan, 0.5, ValidateClick)
 
                     Library:RemoveFromRegistry(Button.Label)
-                    Library:AddToRegistry(Button.Label, { TextColor3 = 'FontColor' })
+                    Library:AddToRegistry(Button.Label, { TextColor3 = 'MiscColor' })
 
-                    Button.Label.TextColor3 = Library.FontColor
+                    Button.Label.TextColor3 = Library.MiscColor
                     Button.Label.Text = Button.Text
                     task.defer(rawset, Button, 'Locked', false)
 
@@ -1739,6 +1775,11 @@ do
         Library:OnHighlight(TextBoxOuter, TextBoxOuter,
             { BorderColor3 = 'AccentColor' },
             { BorderColor3 = 'Black' }
+        );
+
+        Library:OnHighlight(TextBoxOuter, InputLabel,
+            { TextColor3 = 'FontColor' },
+            { TextColor3 = 'MiscColor' }
         );
 
         if type(Info.Tooltip) == 'string' then
@@ -1945,6 +1986,11 @@ do
             { BorderColor3 = 'Black' }
         );
 
+        Library:OnHighlight(ToggleRegion, ToggleLabel,
+            { TextColor3 = function() return Toggle.Value and 'AccentColor' or 'FontColor' end },
+            { TextColor3 = function() return Toggle.Value and 'AccentColor' or 'MiscColor' end }
+        );
+
         function Toggle:UpdateColors()
             Toggle:Display();
         end;
@@ -1960,8 +2006,8 @@ do
             Library.RegistryMap[ToggleInner].Properties.BackgroundColor3 = Toggle.Value and 'AccentColor' or 'MainColor';
             Library.RegistryMap[ToggleInner].Properties.BorderColor3 = Toggle.Value and 'AccentColorDark' or 'OutlineColor';
 
-            ToggleLabel.TextColor3 = Toggle.Value and Library.AccentColor or Library.FontColor;
-            Library.RegistryMap[ToggleLabel].Properties.TextColor3 = Toggle.Value and 'AccentColor' or 'FontColor';
+            ToggleLabel.TextColor3 = Toggle.Value and Library.AccentColor or Library.MiscColor;
+            Library.RegistryMap[ToggleLabel].Properties.TextColor3 = Toggle.Value and 'AccentColor' or 'MiscColor';
         end;
 
         function Toggle:OnChanged(Func)
@@ -2112,6 +2158,11 @@ do
         Library:OnHighlight(SliderOuter, SliderOuter,
             { BorderColor3 = 'AccentColor' },
             { BorderColor3 = 'Black' }
+        );
+
+        Library:OnHighlight(SliderOuter, DisplayLabel,
+            { TextColor3 = 'FontColor' },
+            { TextColor3 = 'MiscColor' }
         );
 
         if type(Info.Tooltip) == 'string' then
@@ -2322,6 +2373,11 @@ do
             { BorderColor3 = 'Black' }
         );
 
+        Library:OnHighlight(DropdownOuter, ItemList,
+            { TextColor3 = 'FontColor' },
+            { TextColor3 = 'MiscColor' }
+        );
+
         if type(Info.Tooltip) == 'string' then
             Library:AddToolTip(Info.Tooltip, DropdownOuter)
         end
@@ -2333,6 +2389,8 @@ do
             BorderColor3 = Color3.new(0, 0, 0);
             ZIndex = 20;
             Visible = false;
+            ClipsDescendants = true;
+            Size = UDim2.fromOffset(0, 0),
             Parent = ScreenGui;
         });
 
@@ -2553,12 +2611,28 @@ do
             ListOuter.Visible = true;
             Library.OpenedFrames[ListOuter] = true;
             DropdownArrow.Rotation = 180;
+
+            local Count = 0;
+            for _, Element in next, Scrolling:GetChildren() do
+                if not Element:IsA('UIListLayout') then
+                    Count = Count + 1;
+                end;
+            end;
+
+            local Y = math.clamp(Count * 20, 0, MAX_DROPDOWN_ITEMS * 20) + 1;
+            Library:TweenProperty(ListOuter, 'Size', UDim2.fromOffset(DropdownOuter.AbsoluteSize.X, Y))
         end;
 
         function Dropdown:CloseDropdown()
-            ListOuter.Visible = false;
             Library.OpenedFrames[ListOuter] = nil;
             DropdownArrow.Rotation = 0;
+
+            local Tween = Library:TweenProperty(ListOuter, 'Size', UDim2.fromOffset(DropdownOuter.AbsoluteSize.X, 0))
+            Tween.Completed:Once(function()
+                if not Library.OpenedFrames[ListOuter] then
+                    ListOuter.Visible = false;
+                end
+            end)
         end;
 
         function Dropdown:OnChanged(Func)
