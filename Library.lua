@@ -500,6 +500,7 @@ do
             BorderMode = Enum.BorderMode.Inset;
             Size = UDim2.new(0, 28, 0, 14);
             ZIndex = 6;
+            Active = true;
             Parent = ToggleLabel;
         });
 
@@ -1454,6 +1455,7 @@ do
             TextWrapped = DoesWrap or false,
             TextXAlignment = Enum.TextXAlignment.Left;
             ZIndex = 5;
+            Active = true;
             Parent = Container;
         });
 
