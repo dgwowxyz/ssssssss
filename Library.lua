@@ -1446,6 +1446,8 @@ do
     end;
 end;
 
+local BaseGroupbox -- forward declaration (populated below, after the do block)
+
 function Library:SetBaseWindow(Window)
     function Window:AddTab(Name)
         local Tab = {
@@ -1872,7 +1874,7 @@ function Library:SetBaseWindow(Window)
     end;
 end
 
-local BaseGroupbox = {};
+BaseGroupbox = {}; -- assigned to the forward-declared upvalue above
 
 do
     local Funcs = {};
