@@ -2087,7 +2087,7 @@ do
             local PropsIcon = Library:CreateLabel({
                 BackgroundTransparency = 1,
                 Size = UDim2.new(1, 0, 1, 0),
-                Text = 'cfg',
+                Text = ' cfg ',
                 TextColor3 = Library.MiscColor,
                 TextSize = 12,
                 ZIndex = 9,
