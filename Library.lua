@@ -180,12 +180,14 @@ function Library:MakeDraggable(Instance, Cutoff)
             end;
 
             while InputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton1) do
-                Instance.Position = UDim2.new(
+                local TargetPos = UDim2.new(
                     0,
                     Mouse.X - ObjPos.X + (Instance.Size.X.Offset * Instance.AnchorPoint.X),
                     0,
                     Mouse.Y - ObjPos.Y + (Instance.Size.Y.Offset * Instance.AnchorPoint.Y)
                 );
+
+                TweenService:Create(Instance, TweenInfo.new(0.08, Enum.EasingStyle.Linear, Enum.EasingDirection.Out), { Position = TargetPos }):Play();
 
                 RenderStepped:Wait();
             end;
