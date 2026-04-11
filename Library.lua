@@ -2104,7 +2104,7 @@ do
                 BackgroundColor3 = Color3.new(0, 0, 0),
                 BorderColor3 = Color3.new(0, 0, 0),
                 Position = UDim2.fromOffset(200, 150),
-                Size = UDim2.fromOffset(320, 340),
+                Size = UDim2.fromOffset(265, 300),
                 Visible = false,
                 ZIndex = 1,
                 Parent = PropsGui,
@@ -2167,10 +2167,34 @@ do
             Library:MakeDraggable(SubOuter)
 
 
-            -- Click icon to open/close — uses its own tracking table,
-            -- NOT OpenedFrames (which would block all clicks inside via MouseIsOverOpenedFrame)
+            -- Click icon to open/close.
+            -- Dropdown/colorpicker popups are created as children of ScreenGui; since
+            -- PropsGui has a higher DisplayOrder they would appear behind it. We fix
+            -- this by hooking ScreenGui.ChildAdded while the window is open and moving
+            -- any new popup children into PropsGui so they render above the window.
             if not Library.OpenedPropertyWindows then
                 Library.OpenedPropertyWindows = {}
+            end
+
+            local popupCaptureConn = nil
+
+            local function startCapture()
+                if popupCaptureConn then return end
+                popupCaptureConn = ScreenGui.ChildAdded:Connect(function(child)
+                    task.defer(function()
+                        -- Only reroute if this props window is the active one
+                        if SubOuter.Visible and child and child.Parent == ScreenGui then
+                            child.Parent = PropsGui
+                        end
+                    end)
+                end)
+            end
+
+            local function stopCapture()
+                if popupCaptureConn then
+                    popupCaptureConn:Disconnect()
+                    popupCaptureConn = nil
+                end
             end
 
             IconWrapper.InputBegan:Connect(function(Input)
@@ -2184,10 +2208,15 @@ do
                         end
                     end
                     Library.OpenedPropertyWindows[Info.Text] = SubOuter
+                    startCapture()
                 else
                     Library.OpenedPropertyWindows[Info.Text] = nil
+                    stopCapture()
                 end
             end)
+
+            -- Clean up if the PropsGui is destroyed
+            PropsGui.Destroying:Connect(stopCapture)
 
             Library:OnHighlight(IconWrapper, PropsIcon,
                 { ImageColor3 = 'AccentColor' },
