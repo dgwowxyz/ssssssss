@@ -1237,11 +1237,10 @@ do
             local State = KeyPicker:GetState();
 
             ContainerLabel.Text = string.format('[%s] %s (%s)', KeyPicker.Value, Info.Text, KeyPicker.Mode);
+            ContainerLabel.Visible = true;
+            ContainerLabel.TextColor3 = Library.AccentColor;
 
-            ContainerLabel.Visible = State;
-            ContainerLabel.TextColor3 = State and Library.AccentColor or Library.FontColor;
-
-            Library.RegistryMap[ContainerLabel].Properties.TextColor3 = 'FontColor';
+            Library.RegistryMap[ContainerLabel].Properties.TextColor3 = 'AccentColor';
 
             local YSize = 0
             local XSize = 0
@@ -2925,7 +2924,7 @@ do
         BorderColor3 = Color3.new(0, 0, 0);
         Position = UDim2.new(0, 10, 0.5, 0);
         Size = UDim2.new(0, 210, 0, 20);
-        Visible = false;
+        Visible = true;
         ClipsDescendants = true;
         ZIndex = 100;
         Parent = ScreenGui;
@@ -2973,7 +2972,7 @@ do
     });
 
     local KeyLabel = Library:CreateLabel({
-        Text = 'key';
+        Text = 'keybind list';
         TextSize = 12;
         Font = Library.Font;
         TextXAlignment = Enum.TextXAlignment.Left;
@@ -2991,7 +2990,7 @@ do
     }, true);
 
     local BindsLabel = Library:CreateLabel({
-        Text = 'binds';
+        Text = '';
         TextSize = 12;
         Font = Library.Font;
         TextXAlignment = Enum.TextXAlignment.Left;
@@ -2999,6 +2998,7 @@ do
         AutomaticSize = Enum.AutomaticSize.X;
         ZIndex = 105;
         Parent = KeybindTitleFrame;
+        Visible = false;
     });
 
     Library:ApplyTextStroke(BindsLabel);
