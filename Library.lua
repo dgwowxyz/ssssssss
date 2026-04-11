@@ -39,7 +39,7 @@ local Library = {
     Black = Color3.new(0, 0, 0);
     Font = Enum.Font.Code,
 
-    TweenStyle = Enum.EasingStyle.Linear,
+    TweenStyle = Enum.EasingStyle.Back,
     TweenDirection = Enum.EasingDirection.Out,
     TweenTime = 0.15,
     DragTime = 0.08,
