@@ -168,7 +168,7 @@ function Library:CreateLabel(Properties, IsHud)
 
     Library:AddToRegistry(_Instance, {
         TextColor3 = 'MiscColor';
-        FontFace = 'Font';
+        Font = 'Font';
     }, IsHud);
 
     return Library:Create(_Instance, Properties);
@@ -429,7 +429,8 @@ function Library:UpdateColorsUsingRegistry()
             if type(ColorIdx) == 'string' then
                 Object.Instance[Property] = Library[ColorIdx];
             elseif type(ColorIdx) == 'function' then
-                Object.Instance[Property] = ColorIdx()
+                local Result = ColorIdx();
+                Object.Instance[Property] = Library[Result] or Result;
             end
         end;
     end;
