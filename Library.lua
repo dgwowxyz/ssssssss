@@ -2073,22 +2073,23 @@ do
         end
 
         function Toggle:AddProperties()
-            -- Icon wrapper frame (always visible, image inside)
+            -- Icon wrapper frame (always visible, text inside)
             local IconWrapper = Library:Create('Frame', {
                 BackgroundColor3 = Library.MainColor,
                 BorderColor3 = Library.OutlineColor,
                 BorderMode = Enum.BorderMode.Inset,
-                Size = UDim2.new(0, 14, 0, 14),
+                Size = UDim2.new(0, 24, 0, 14),
                 ZIndex = 8,
                 Parent = ToggleLabel,
             })
             Library:AddToRegistry(IconWrapper, { BackgroundColor3 = 'MainColor', BorderColor3 = 'OutlineColor' })
 
-            local PropsIcon = Library:Create('ImageLabel', {
+            local PropsIcon = Library:CreateLabel({
                 BackgroundTransparency = 1,
-                Position = UDim2.new(0, 1, 0, 1),
-                Size = UDim2.new(1, -2, 1, -2),
-                Image = 'rbxassetid://4492476134',
+                Size = UDim2.new(1, 0, 1, 0),
+                Text = 'cfg',
+                TextColor3 = Library.MiscColor,
+                TextSize = 12,
                 ZIndex = 9,
                 Parent = IconWrapper,
             })
@@ -2222,8 +2223,8 @@ do
             PropsGui.Destroying:Connect(stopCapture)
 
             Library:OnHighlight(IconWrapper, PropsIcon,
-                { ImageColor3 = 'AccentColor' },
-                { ImageColor3 = 'MiscColor' }
+                { TextColor3 = 'AccentColor' },
+                { TextColor3 = 'MiscColor' }
             )
 
             local PropsWindow = { _Tabs = {} }
