@@ -2070,17 +2070,25 @@ do
         end
 
         function Toggle:AddProperties()
-            -- Icon that appears next to the toggle label (same row as colorpickers)
-            local PropsIcon = Library:Create('ImageLabel', {
-                Active = true,
-                BackgroundTransparency = 1,
-                Size = UDim2.new(0, 12, 0, 12),
-                Image = 'rbxassetid://4492476134',
-                ImageColor3 = Library.MiscColor,
-                ZIndex = 9,
-                Parent = ToggleLabel
+            -- Icon wrapper frame (always visible, image inside)
+            local IconWrapper = Library:Create('Frame', {
+                BackgroundColor3 = Library.MainColor,
+                BorderColor3 = Library.OutlineColor,
+                BorderMode = Enum.BorderMode.Inset,
+                Size = UDim2.new(0, 14, 0, 14),
+                ZIndex = 8,
+                Parent = ToggleLabel,
             })
-            Library:AddToRegistry(PropsIcon, { ImageColor3 = 'MiscColor' })
+            Library:AddToRegistry(IconWrapper, { BackgroundColor3 = 'MainColor', BorderColor3 = 'OutlineColor' })
+
+            local PropsIcon = Library:Create('ImageLabel', {
+                BackgroundTransparency = 1,
+                Position = UDim2.new(0, 1, 0, 1),
+                Size = UDim2.new(1, -2, 1, -2),
+                Image = 'rbxassetid://4492476134',
+                ZIndex = 9,
+                Parent = IconWrapper,
+            })
 
             -- Draggable sub-window
             local SubOuter = Library:Create('Frame', {
@@ -2149,8 +2157,8 @@ do
 
             Library:MakeDraggable(SubOuter)
 
-            -- Toggle icon click
-            PropsIcon.InputBegan:Connect(function(Input)
+            -- Click on wrapper frame to toggle window
+            IconWrapper.InputBegan:Connect(function(Input)
                 if Input.UserInputType ~= Enum.UserInputType.MouseButton1 then return end
                 SubOuter.Visible = not SubOuter.Visible
                 if SubOuter.Visible then
@@ -2166,8 +2174,7 @@ do
                 end
             end)
 
-            -- Highlight icon on hover
-            Library:OnHighlight(PropsIcon, PropsIcon,
+            Library:OnHighlight(IconWrapper, PropsIcon,
                 { ImageColor3 = 'AccentColor' },
                 { ImageColor3 = 'MiscColor' }
             )
@@ -2303,7 +2310,7 @@ do
                     local Container = Library:Create('Frame', {
                         BackgroundTransparency = 1,
                         Position = UDim2.new(0, 4, 0, 20),
-                        Size = UDim2.new(1, -4, 1, -20),
+                        Size = UDim2.new(1, -4, 0, 0), -- pure offset Y, updated by Resize
                         ZIndex = 104,
                         Parent = BoxInner,
                     })
@@ -2320,6 +2327,7 @@ do
                                 H = H + c.Size.Y.Offset
                             end
                         end
+                        Container.Size = UDim2.new(1, -4, 0, H)
                         BoxOuter.Size = UDim2.new(1, 0, 0, 20 + H + 4)
                     end
 
