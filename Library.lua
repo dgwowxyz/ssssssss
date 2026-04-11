@@ -1185,7 +1185,7 @@ do
             ContainerLabel.Visible = State;
             ContainerLabel.TextColor3 = State and Library.AccentColor or Library.FontColor;
 
-            Library.RegistryMap[ContainerLabel].Properties.TextColor3 = State and 'AccentColor' or 'FontColor';
+            Library.RegistryMap[ContainerLabel].Properties.TextColor3 = 'FontColor';
 
             local YSize = 0
             local XSize = 0
@@ -2854,21 +2854,52 @@ do
         BackgroundColor3 = 'AccentColor';
     }, true);
 
-    local KeybindLabel = Library:CreateLabel({
-        Size = UDim2.new(1, -5, 0, 20);
+    local KeybindTitleFrame = Library:Create('Frame', {
+        BackgroundTransparency = 1;
         Position = UDim2.fromOffset(5, 2),
-        TextXAlignment = Enum.TextXAlignment.Left,
-
-        Text = 'keybinds';
-        TextSize = 12;
-        Font = Library.Font;
+        Size = UDim2.new(1, -5, 0, 20);
         ZIndex = 104;
         Parent = KeybindInner;
     });
 
-    Library:ApplyTextStroke(KeybindLabel);
+    Library:Create('UIListLayout', {
+        FillDirection = Enum.FillDirection.Horizontal;
+        SortOrder = Enum.SortOrder.LayoutOrder;
+        Parent = KeybindTitleFrame;
+    });
 
-    Library:AddToRegistry(KeybindLabel, {
+    local KeyLabel = Library:CreateLabel({
+        Text = 'key';
+        TextSize = 12;
+        Font = Library.Font;
+        TextXAlignment = Enum.TextXAlignment.Left;
+        Size = UDim2.new(0, 0, 1, 0);
+        AutomaticSize = Enum.AutomaticSize.X;
+        ZIndex = 105;
+        Parent = KeybindTitleFrame;
+    });
+
+    Library:ApplyTextStroke(KeyLabel);
+
+    Library:AddToRegistry(KeyLabel, {
+        TextColor3 = 'AccentColor';
+        FontFace = 'Font';
+    }, true);
+
+    local BindsLabel = Library:CreateLabel({
+        Text = 'binds';
+        TextSize = 12;
+        Font = Library.Font;
+        TextXAlignment = Enum.TextXAlignment.Left;
+        Size = UDim2.new(0, 0, 1, 0);
+        AutomaticSize = Enum.AutomaticSize.X;
+        ZIndex = 105;
+        Parent = KeybindTitleFrame;
+    });
+
+    Library:ApplyTextStroke(BindsLabel);
+
+    Library:AddToRegistry(BindsLabel, {
         TextColor3 = 'FontColor';
         FontFace = 'Font';
     }, true);
