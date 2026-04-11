@@ -1176,7 +1176,7 @@ do
 
             ContainerLabel.Text = string.format('[%s] %s (%s)', KeyPicker.Value, Info.Text, KeyPicker.Mode);
 
-            ContainerLabel.Visible = true;
+            ContainerLabel.Visible = State;
             ContainerLabel.TextColor3 = State and Library.AccentColor or Library.FontColor;
 
             Library.RegistryMap[ContainerLabel].Properties.TextColor3 = State and 'AccentColor' or 'FontColor';
@@ -1194,6 +1194,10 @@ do
             end;
 
             Library.KeybindFrame.Size = UDim2.new(0, math.max(XSize + 10, 210), 0, YSize + 23)
+            Library.KeybindFrame.Visible = (YSize > 0);
+
+            DisplayLabel.TextColor3 = (KeyPicker.Value ~= 'None') and Library.AccentColor or Library.FontColor;
+            Library.RegistryMap[DisplayLabel].Properties.TextColor3 = (KeyPicker.Value ~= 'None') and 'AccentColor' or 'FontColor';
         end;
 
         function KeyPicker:GetState()
@@ -1921,6 +1925,9 @@ do
 
             Library.RegistryMap[ToggleInner].Properties.BackgroundColor3 = Toggle.Value and 'AccentColor' or 'MainColor';
             Library.RegistryMap[ToggleInner].Properties.BorderColor3 = Toggle.Value and 'AccentColorDark' or 'OutlineColor';
+
+            ToggleLabel.TextColor3 = Toggle.Value and Library.AccentColor or Library.FontColor;
+            Library.RegistryMap[ToggleLabel].Properties.TextColor3 = Toggle.Value and 'AccentColor' or 'FontColor';
         end;
 
         function Toggle:OnChanged(Func)
@@ -3252,6 +3259,9 @@ function Library:CreateWindow(...)
             TabButton.BackgroundColor3 = Library.MainColor;
             Library.RegistryMap[TabButton].Properties.BackgroundColor3 = 'MainColor';
             
+            TabButtonLabel.TextColor3 = Library.AccentColor;
+            Library.RegistryMap[TabButtonLabel].Properties.TextColor3 = 'AccentColor';
+
             TabFrame.Visible = true;
             Fader.BackgroundTransparency = 0;
 
@@ -3263,6 +3273,9 @@ function Library:CreateWindow(...)
             TabButton.BackgroundColor3 = Library.BackgroundColor;
             Library.RegistryMap[TabButton].Properties.BackgroundColor3 = 'BackgroundColor';
             
+            TabButtonLabel.TextColor3 = Library.FontColor;
+            Library.RegistryMap[TabButtonLabel].Properties.TextColor3 = 'FontColor';
+
             if TabFrame.Visible then
                 Fader.BackgroundTransparency = 1;
                 local Tween = TweenService:Create(Fader, TweenInfo.new(0.15, Enum.EasingStyle.Linear, Enum.EasingDirection.Out), { BackgroundTransparency = 0 });
