@@ -1538,6 +1538,12 @@ function Library:SetBaseWindow(Window)
             Parent = RightSide;
         });
 
+        for _, Side in next, { LeftSide, RightSide } do
+            Side:WaitForChild('UIListLayout'):GetPropertyChangedSignal('AbsoluteContentSize'):Connect(function()
+                Side.CanvasSize = UDim2.fromOffset(0, Side.UIListLayout.AbsoluteContentSize.Y);
+            end);
+        end;
+
         function Tab:ShowTab()
             for _, T in next, Window.Tabs do
                 T:HideTab();
@@ -1556,6 +1562,10 @@ function Library:SetBaseWindow(Window)
             TabFrame.Visible = false;
         end;
 
+        function Tab:SetLayoutOrder(Position)
+            TabButton.LayoutOrder = Position;
+        end;
+
         TabButton.InputBegan:Connect(function(Input)
             if Input.UserInputType == Enum.UserInputType.MouseButton1 then
                 Tab:ShowTab();
@@ -1563,6 +1573,13 @@ function Library:SetBaseWindow(Window)
         end);
 
         function Tab:AddGroupbox(Name)
+            local Info = {};
+            if type(Name) == 'table' then
+                Info = Name;
+            else
+                Info.Name = Name;
+            end;
+
             local Groupbox = {};
 
             local BoxOuter = Library:Create('Frame', {
@@ -1570,7 +1587,7 @@ function Library:SetBaseWindow(Window)
                 BorderColor3 = Color3.new(0, 0, 0);
                 Size = UDim2.new(1, 0, 0, 507);
                 ZIndex = 2;
-                Parent = #Tab.Groupboxes % 2 == 0 and LeftSide or RightSide;
+                Parent = Info.Side == 1 and LeftSide or Info.Side == 2 and RightSide or (#Tab.Groupboxes % 2 == 0 and LeftSide or RightSide);
             });
 
             Library:AddToRegistry(BoxOuter, {
@@ -1595,7 +1612,7 @@ function Library:SetBaseWindow(Window)
                 Size = UDim2.new(0, 0, 0, 14);
                 Position = UDim2.new(0, 10, 0, -2);
                 BackgroundColor3 = Library.MainColor;
-                Text = Name;
+                Text = Info.Name;
                 TextSize = 12;
                 ZIndex = 6;
                 Parent = BoxInner;
@@ -1643,7 +1660,22 @@ function Library:SetBaseWindow(Window)
             return Groupbox;
         end;
 
-        function Tab:AddTabbox()
+        function Tab:AddLeftGroupbox(Name)
+            return Tab:AddGroupbox({ Name = Name, Side = 1 });
+        end;
+
+        function Tab:AddRightGroupbox(Name)
+            return Tab:AddGroupbox({ Name = Name, Side = 2 });
+        end;
+
+        function Tab:AddTabbox(Name)
+            local Info = {};
+            if type(Name) == 'table' then
+                Info = Name;
+            else
+                Info.Name = Name;
+            end;
+
             local Tabbox = {
                 Tabs = {};
             };
@@ -1653,7 +1685,7 @@ function Library:SetBaseWindow(Window)
                 BorderColor3 = Color3.new(0, 0, 0);
                 Size = UDim2.new(1, 0, 0, 0);
                 ZIndex = 2;
-                Parent = #Tab.Groupboxes % 2 == 0 and LeftSide or RightSide;
+                Parent = Info.Side == 1 and LeftSide or Info.Side == 2 and RightSide or (#Tab.Groupboxes % 2 == 0 and LeftSide or RightSide);
             });
 
             Library:AddToRegistry(BoxOuter, {
@@ -1820,6 +1852,14 @@ function Library:SetBaseWindow(Window)
             table.insert(Tab.Tabboxes, Tabbox);
 
             return Tabbox;
+        end;
+
+        function Tab:AddLeftTabbox(Name)
+            return Tab:AddTabbox({ Name = Name, Side = 1 });
+        end;
+
+        function Tab:AddRightTabbox(Name)
+            return Tab:AddTabbox({ Name = Name, Side = 2 });
         end;
 
         if #Window.Tabs == 0 then
