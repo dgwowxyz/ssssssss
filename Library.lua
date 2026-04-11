@@ -2821,6 +2821,7 @@ do
         Position = UDim2.new(0, 10, 0.5, 0);
         Size = UDim2.new(0, 210, 0, 20);
         Visible = false;
+        ClipsDescendants = true;
         ZIndex = 100;
         Parent = ScreenGui;
     });
@@ -2830,6 +2831,7 @@ do
         BorderColor3 = Library.OutlineColor;
         BorderMode = Enum.BorderMode.Inset;
         Size = UDim2.new(1, 0, 1, 0);
+        ClipsDescendants = true;
         ZIndex = 101;
         Parent = KeybindOuter;
     });
@@ -2852,7 +2854,7 @@ do
     }, true);
 
     local KeybindLabel = Library:CreateLabel({
-        Size = UDim2.new(1, 0, 0, 20);
+        Size = UDim2.new(1, -5, 0, 20);
         Position = UDim2.fromOffset(5, 2),
         TextXAlignment = Enum.TextXAlignment.Left,
 
@@ -2867,7 +2869,7 @@ do
 
     Library:AddToRegistry(KeybindLabel, {
         TextColor3 = 'FontColor';
-        Font = 'Font';
+        FontFace = 'Font';
     }, true);
 
     local HUD_Fader = Library:Create('Frame', {
