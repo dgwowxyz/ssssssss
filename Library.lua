@@ -2090,6 +2090,7 @@ do
                 Position = UDim2.new(0, 1, 0, 1),
                 Size = UDim2.new(1, -2, 1, -2),
                 Image = 'rbxassetid://4492476134',
+                ImageColor3 = Library.MiscColor,
                 ZIndex = 9,
                 Parent = IconWrapper,
             })
@@ -2098,8 +2099,8 @@ do
             -- correctly render above groupbox frames (ZIndex=4) within this window.
             local PropsGui = Instance.new('ScreenGui')
             ProtectGui(PropsGui)
-            PropsGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-            PropsGui.DisplayOrder = 10
+            PropsGui.ZIndexBehavior = Enum.ZIndexBehavior.Global
+            PropsGui.DisplayOrder = 100
             PropsGui.Name = 'PropertiesGui_' .. Info.Text
             PropsGui.Parent = CoreGui
 
@@ -2139,7 +2140,8 @@ do
                 Position = UDim2.new(0, 4, 0, 4),
                 Size = UDim2.new(0, 14, 0, 14),
                 Image = 'rbxassetid://4492476134',
-                ZIndex = 4,
+                ImageColor3 = Color3.new(1, 1, 1),
+                ZIndex = 5,
                 Parent = TitleBar,
             })
 
@@ -2190,13 +2192,25 @@ do
             end
 
             local popupCaptureConn = nil
+            local signalConn = nil
+
+            local function stopCapture()
+                if popupCaptureConn then
+                    popupCaptureConn:Disconnect()
+                    popupCaptureConn = nil
+                end
+                if signalConn then
+                    signalConn:Disconnect()
+                    signalConn = nil
+                end
+            end
 
             local function startCapture()
                 if popupCaptureConn then return end
                 popupCaptureConn = ScreenGui.ChildAdded:Connect(function(child)
                     if SubOuter.Visible then
                         task.defer(function()
-                            if child.Parent == ScreenGui then
+                            if child.Parent == ScreenGui and child.Name == 'Color' then
                                 child.Parent = PropsGui
                             end
                         end)
@@ -2204,33 +2218,20 @@ do
                 end)
 
                 -- Listen for property changes on ScreenGui as a signal to re-check popups
-                local signalConn = ScreenGui:GetPropertyChangedSignal("Name"):Connect(function()
+                signalConn = ScreenGui:GetPropertyChangedSignal("Name"):Connect(function()
                     if SubOuter.Visible then
                         for _, child in next, ScreenGui:GetChildren() do
-                            if child.Name == 'Color' or (child:IsA('Frame') and child.ZIndex >= 100) then
+                            if child.Name == 'Color' then
                                 child.Parent = PropsGui
                             end
                         end
                     end
                 end)
-                
+
                 for _, child in next, ScreenGui:GetChildren() do
-                    if child.Name == 'Color' or (child:IsA('Frame') and child.ZIndex >= 100) then
+                    if child.Name == 'Color' then
                         child.Parent = PropsGui
                     end
-                end
-
-                local oldStop = stopCapture
-                stopCapture = function()
-                    if signalConn then signalConn:Disconnect() end
-                    oldStop()
-                end
-            end
-
-            local function stopCapture()
-                if popupCaptureConn then
-                    popupCaptureConn:Disconnect()
-                    popupCaptureConn = nil
                 end
             end
 
