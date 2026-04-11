@@ -2544,8 +2544,8 @@ do
                         Selected = Dropdown.Value == Value;
                     end;
 
-                    ButtonLabel.TextColor3 = Selected and Library.AccentColor or Library.FontColor;
-                    Library.RegistryMap[ButtonLabel].Properties.TextColor3 = Selected and 'AccentColor' or 'FontColor';
+                    Library:TweenProperty(ButtonLabel, 'TextColor3', Selected and Library.AccentColor or Library.MiscColor)
+                    Library.RegistryMap[ButtonLabel].Properties.TextColor3 = Selected and 'AccentColor' or 'MiscColor';
                 end;
 
                 ButtonLabel.InputBegan:Connect(function(Input)
@@ -3327,6 +3327,11 @@ function Library:CreateWindow(...)
             Parent = TabButton;
         });
 
+        Library:OnHighlight(TabButton, TabButtonLabel,
+            { TextColor3 = function() return Window.Tabs[Name] == Tab and 'AccentColor' or 'FontColor' end },
+            { TextColor3 = function() return Window.Tabs[Name] == Tab and 'AccentColor' or 'MiscColor' end }
+        )
+
         local Blocker = Library:Create('Frame', {
             BackgroundColor3 = Library.MainColor;
             BorderSizePixel = 0;
@@ -3410,7 +3415,7 @@ function Library:CreateWindow(...)
             TabButton.BackgroundColor3 = Library.MainColor;
             Library.RegistryMap[TabButton].Properties.BackgroundColor3 = 'MainColor';
             
-            TabButtonLabel.TextColor3 = Library.AccentColor;
+            Library:TweenProperty(TabButtonLabel, 'TextColor3', Library.AccentColor)
             Library.RegistryMap[TabButtonLabel].Properties.TextColor3 = 'AccentColor';
 
             TabFrame.Visible = true;
@@ -3421,8 +3426,8 @@ function Library:CreateWindow(...)
             TabButton.BackgroundColor3 = Library.BackgroundColor;
             Library.RegistryMap[TabButton].Properties.BackgroundColor3 = 'BackgroundColor';
             
-            TabButtonLabel.TextColor3 = Library.FontColor;
-            Library.RegistryMap[TabButtonLabel].Properties.TextColor3 = 'FontColor';
+            Library:TweenProperty(TabButtonLabel, 'TextColor3', Library.MiscColor)
+            Library.RegistryMap[TabButtonLabel].Properties.TextColor3 = 'MiscColor';
 
             TabFrame.Visible = false;
         end;
@@ -3614,6 +3619,11 @@ function Library:CreateWindow(...)
                     Parent = Button;
                 });
 
+                Library:OnHighlight(Button, ButtonLabel,
+                    { TextColor3 = function() return Tabbox.Tabs[Name] == Tab and 'AccentColor' or 'FontColor' end },
+                    { TextColor3 = function() return Tabbox.Tabs[Name] == Tab and 'AccentColor' or 'MiscColor' end }
+                )
+
                 local Block = Library:Create('Frame', {
                     BackgroundColor3 = Library.BackgroundColor;
                     BorderSizePixel = 0;
@@ -3654,6 +3664,9 @@ function Library:CreateWindow(...)
                     Button.BackgroundColor3 = Library.BackgroundColor;
                     Library.RegistryMap[Button].Properties.BackgroundColor3 = 'BackgroundColor';
 
+                    Library:TweenProperty(ButtonLabel, 'TextColor3', Library.AccentColor)
+                    Library.RegistryMap[ButtonLabel].Properties.TextColor3 = 'AccentColor';
+
                     Tab:Resize();
                 end;
 
@@ -3663,6 +3676,9 @@ function Library:CreateWindow(...)
 
                     Button.BackgroundColor3 = Library.MainColor;
                     Library.RegistryMap[Button].Properties.BackgroundColor3 = 'MainColor';
+
+                    Library:TweenProperty(ButtonLabel, 'TextColor3', Library.MiscColor)
+                    Library.RegistryMap[ButtonLabel].Properties.TextColor3 = 'MiscColor';
                 end;
 
                 function Tab:Resize()
