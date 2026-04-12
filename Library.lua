@@ -4146,13 +4146,11 @@ do
 
             local IconWrapper = Library:Create('Frame', {
 
-                BackgroundColor3 = Library.MainColor,
+                BackgroundTransparency = 1,
 
-                BorderColor3 = Library.OutlineColor,
+                BorderSizePixel = 0,
 
-                BorderMode = Enum.BorderMode.Inset,
-
-                Position = UDim2.new(1, -20, 0, 0),
+                Position = UDim2.new(1, -18, 0, 0),
 
                 Size = UDim2.new(0, 14, 0, 14),
 
@@ -4162,31 +4160,25 @@ do
 
             })
 
-            Library:AddToRegistry(IconWrapper, { BackgroundColor3 = 'MainColor', BorderColor3 = 'OutlineColor' })
 
 
-
-            local PropsIcon = Library:CreateLabel({
+            local PropsIcon = Library:Create('ImageLabel', {
 
                 BackgroundTransparency = 1,
 
-                Position = UDim2.new(0, 0, 0, -1),
+                Position = UDim2.new(0, 0, 0, 0),
 
                 Size = UDim2.new(1, 0, 1, 0),
 
-                Text = "⚙",
+                Image = 'rbxassetid://7059346386',
 
-                TextSize = 10,
-
-                TextColor3 = Library.MiscColor,
+                ImageColor3 = Color3.new(1, 1, 1),
 
                 ZIndex = 9,
 
                 Parent = IconWrapper,
 
             })
-
-            Library:AddToRegistry(PropsIcon, { TextColor3 = 'MiscColor' })
 
 
 
@@ -4403,20 +4395,74 @@ do
 
 
             local PropsFading = false
+            local PropsTransparencyCache = {}
+
+            local function getTransparencyCache(desc)
+                if not PropsTransparencyCache[desc] then
+                    PropsTransparencyCache[desc] = {
+                        bg = desc:IsA('GuiObject') and desc.BackgroundTransparency or nil,
+                        txt = (desc:IsA('TextLabel') or desc:IsA('TextBox')) and desc.TextTransparency or nil,
+                        img = desc:IsA('ImageLabel') and desc.ImageTransparency or nil,
+                        stroke = desc:IsA('UIStroke') and desc.Transparency or nil
+                    }
+                end
+                return PropsTransparencyCache[desc]
+            end
 
             local function fadePropsWindow(visible)
                 if PropsFading then return end
                 PropsFading = true
 
-                local tweenInfo = TweenInfo.new(Library.TweenTime, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+                local tweenInfo = TweenInfo.new(Library.TweenTime, Library.TweenStyle, Library.TweenDirection)
 
                 if visible then
+                    SubOuter.Visible = true
+                    -- Cache and set all to transparent first
+                    for _, desc in next, SubOuter:GetDescendants() do
+                        local cache = getTransparencyCache(desc)
+                        if desc:IsA('GuiObject') then desc.BackgroundTransparency = 1 end
+                        if desc:IsA('TextLabel') or desc:IsA('TextBox') then desc.TextTransparency = 1 end
+                        if desc:IsA('ImageLabel') then desc.ImageTransparency = 1 end
+                        if desc:IsA('UIStroke') then desc.Transparency = 1 end
+                    end
                     SubOuter.BackgroundTransparency = 1
                     SubInner.BackgroundTransparency = 1
-                    SubOuter.Visible = true
+                    -- Now fade everything in
+                    for _, desc in next, SubOuter:GetDescendants() do
+                        local cache = PropsTransparencyCache[desc]
+                        if cache then
+                            if desc:IsA('GuiObject') and cache.bg ~= nil then
+                                TweenService:Create(desc, tweenInfo, { BackgroundTransparency = cache.bg }):Play()
+                            end
+                            if (desc:IsA('TextLabel') or desc:IsA('TextBox')) and cache.txt ~= nil then
+                                TweenService:Create(desc, tweenInfo, { TextTransparency = cache.txt }):Play()
+                            end
+                            if desc:IsA('ImageLabel') and cache.img ~= nil then
+                                TweenService:Create(desc, tweenInfo, { ImageTransparency = cache.img }):Play()
+                            end
+                            if desc:IsA('UIStroke') and cache.stroke ~= nil then
+                                TweenService:Create(desc, tweenInfo, { Transparency = cache.stroke }):Play()
+                            end
+                        end
+                    end
                     TweenService:Create(SubOuter, tweenInfo, { BackgroundTransparency = 0 }):Play()
                     TweenService:Create(SubInner, tweenInfo, { BackgroundTransparency = 0 }):Play()
                 else
+                    -- Fade out everything
+                    for _, desc in next, SubOuter:GetDescendants() do
+                        if desc:IsA('GuiObject') then
+                            TweenService:Create(desc, tweenInfo, { BackgroundTransparency = 1 }):Play()
+                        end
+                        if desc:IsA('TextLabel') or desc:IsA('TextBox') then
+                            TweenService:Create(desc, tweenInfo, { TextTransparency = 1 }):Play()
+                        end
+                        if desc:IsA('ImageLabel') then
+                            TweenService:Create(desc, tweenInfo, { ImageTransparency = 1 }):Play()
+                        end
+                        if desc:IsA('UIStroke') then
+                            TweenService:Create(desc, tweenInfo, { Transparency = 1 }):Play()
+                        end
+                    end
                     TweenService:Create(SubOuter, tweenInfo, { BackgroundTransparency = 1 }):Play()
                     TweenService:Create(SubInner, tweenInfo, { BackgroundTransparency = 1 }):Play()
                 end
@@ -4478,9 +4524,9 @@ do
 
             Library:OnHighlight(IconWrapper, PropsIcon,
 
-                { TextColor3 = 'AccentColor' },
+                { ImageColor3 = 'AccentColor' },
 
-                { TextColor3 = 'MiscColor' }
+                { ImageColor3 = 'FontColor' }
 
             )
 
