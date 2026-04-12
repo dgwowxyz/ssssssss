@@ -902,6 +902,16 @@ function Library:UpdateColorsUsingRegistry()
 
     end;
 
+
+
+    -- Update gradient overlay colors if it exists
+
+    if Library.SetGradientColors then
+
+        Library:SetGradientColors(Library.AccentColor, Library.MainColor);
+
+    end;
+
 end;
 
 
@@ -4146,9 +4156,11 @@ do
 
             local IconWrapper = Library:Create('Frame', {
 
-                BackgroundTransparency = 1,
+                BackgroundColor3 = Library.MainColor,
 
-                BorderSizePixel = 0,
+                BorderColor3 = Library.OutlineColor,
+
+                BorderMode = Enum.BorderMode.Inset,
 
                 Position = UDim2.new(1, -18, 0, 0),
 
@@ -4160,15 +4172,17 @@ do
 
             })
 
+            Library:AddToRegistry(IconWrapper, { BackgroundColor3 = 'MainColor', BorderColor3 = 'OutlineColor' })
+
 
 
             local PropsIcon = Library:Create('ImageLabel', {
 
                 BackgroundTransparency = 1,
 
-                Position = UDim2.new(0, 0, 0, 0),
+                Position = UDim2.new(0.5, -6, 0.5, -6),
 
-                Size = UDim2.new(1, 0, 1, 0),
+                Size = UDim2.new(0, 12, 0, 12),
 
                 Image = 'rbxassetid://7059346385',
 
@@ -7135,6 +7149,140 @@ function Library:CreateWindow(...)
         BorderColor3 = 'AccentColor';
 
     });
+
+
+
+    -- Gradient Overlay System
+
+    Library.GradientOverlayEnabled = false;
+
+    Library.GradientAnimationSpeed = 1;
+
+    Library.GradientAnimationDirection = 'Left'; -- 'Left' or 'Right'
+
+
+
+    local GradientOverlay = Library:Create('Frame', {
+
+        Name = 'GradientOverlay';
+
+        BackgroundTransparency = 1;
+
+        BorderSizePixel = 0;
+
+        Position = UDim2.new(0, 2, 0, 2);
+
+        Size = UDim2.new(1, -4, 1, -4);
+
+        ZIndex = 0;
+
+        Visible = false;
+
+        Parent = Inner;
+
+    });
+
+
+
+    local OverlayGradient = Library:Create('UIGradient', {
+
+        Color = ColorSequence.new({
+
+            ColorSequenceKeypoint.new(0, Library.AccentColor),
+
+            ColorSequenceKeypoint.new(0.5, Library.MainColor),
+
+            ColorSequenceKeypoint.new(1, Library.AccentColor)
+
+        });
+
+        Rotation = 90;
+
+        Transparency = NumberSequence.new({
+
+            NumberSequenceKeypoint.new(0, 0.85),
+
+            NumberSequenceKeypoint.new(0.5, 0.95),
+
+            NumberSequenceKeypoint.new(1, 0.85)
+
+        });
+
+        Parent = GradientOverlay;
+
+    });
+
+
+
+    -- Gradient animation
+
+    local GradientConnection = nil;
+
+
+
+    function Library:SetGradientOverlayEnabled(enabled)
+
+        Library.GradientOverlayEnabled = enabled;
+
+        GradientOverlay.Visible = enabled;
+
+
+
+        if enabled and not GradientConnection then
+
+            GradientConnection = RunService.RenderStepped:Connect(function()
+
+                if not Library.GradientOverlayEnabled then return end
+
+                local t = tick() * Library.GradientAnimationSpeed;
+
+                local offset = (t % 1);
+
+                if Library.GradientAnimationDirection == 'Right' then
+
+                    offset = -offset;
+
+                end
+
+                OverlayGradient.Offset = Vector2.new(offset, 0);
+
+            end);
+
+        elseif not enabled and GradientConnection then
+
+            GradientConnection:Disconnect();
+
+            GradientConnection = nil;
+
+        end
+
+    end;
+
+
+
+    function Library:SetGradientColors(accentColor, mainColor)
+
+        OverlayGradient.Color = ColorSequence.new({
+
+            ColorSequenceKeypoint.new(0, accentColor or Library.AccentColor),
+
+            ColorSequenceKeypoint.new(0.5, mainColor or Library.MainColor),
+
+            ColorSequenceKeypoint.new(1, accentColor or Library.AccentColor)
+
+        });
+
+    end;
+
+
+
+    function Library:SetGradientAnimation(speed, direction)
+
+        Library.GradientAnimationSpeed = speed or 1;
+
+        Library.GradientAnimationDirection = direction or 'Left';
+
+    end;
 
 
 
