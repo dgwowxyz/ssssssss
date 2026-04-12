@@ -360,9 +360,7 @@ function Library:MakeDraggable(Instance, Cutoff)
 
         if Input.UserInputType == Enum.UserInputType.MouseButton1 then
 
-            local StartMouse = Vector2.new(Mouse.X, Mouse.Y);
-
-            local StartOffset = Vector2.new(
+            local ObjPos = Vector2.new(
 
                 Mouse.X - Instance.AbsolutePosition.X,
 
@@ -372,7 +370,7 @@ function Library:MakeDraggable(Instance, Cutoff)
 
 
 
-            if StartOffset.Y > (Cutoff or 40) then
+            if ObjPos.Y > (Cutoff or 40) then
 
                 return;
 
@@ -380,31 +378,67 @@ function Library:MakeDraggable(Instance, Cutoff)
 
 
 
-            local StartPos = Instance.Position;
+            local HasAutomaticSize = (Instance.AutomaticSize ~= Enum.AutomaticSize.None);
 
 
 
-            while InputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton1) do
+            if HasAutomaticSize then
 
-                local Delta = Vector2.new(Mouse.X, Mouse.Y) - StartMouse;
+                -- For AutomaticSize frames (watermark): direct position setting
 
-                local TargetPos = UDim2.new(
+                local StartPos = Instance.Position;
 
-                    StartPos.X.Scale,
-
-                    StartPos.X.Offset + Delta.X,
-
-                    StartPos.Y.Scale,
-
-                    StartPos.Y.Offset + Delta.Y
-
-                );
+                local MouseStart = Vector2.new(Mouse.X, Mouse.Y);
 
 
 
-                Instance.Position = TargetPos;
+                while InputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton1) do
 
-                RenderStepped:Wait();
+                    local Delta = Vector2.new(Mouse.X, Mouse.Y) - MouseStart;
+
+                    Instance.Position = UDim2.new(
+
+                        StartPos.X.Scale,
+
+                        StartPos.X.Offset + Delta.X,
+
+                        StartPos.Y.Scale,
+
+                        StartPos.Y.Offset + Delta.Y
+
+                    );
+
+                    RenderStepped:Wait();
+
+                end;
+
+            else
+
+                -- For normal frames: tween-based dragging
+
+                while InputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton1) do
+
+                    local TargetPos = UDim2.new(
+
+                        0,
+
+                        Mouse.X - ObjPos.X + (Instance.AbsoluteSize.X * Instance.AnchorPoint.X),
+
+                        0,
+
+                        Mouse.Y - ObjPos.Y + (Instance.AbsoluteSize.Y * Instance.AnchorPoint.Y)
+
+                    );
+
+
+
+                    TweenService:Create(Instance, TweenInfo.new(Library.DragTime, Library.TweenStyle, Library.TweenDirection), { Position = TargetPos }):Play();
+
+
+
+                    RenderStepped:Wait();
+
+                end;
 
             end;
 
