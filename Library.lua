@@ -4172,13 +4172,17 @@ do
 
                 Size = UDim2.new(1, -2, 1, -2),
 
-                Image = 'rbxassetid://7059346386',
+                Image = 'rbxasset://textures/ui/Settings.png',
+
+                ImageColor3 = Library.MiscColor,
 
                 ZIndex = 9,
 
                 Parent = IconWrapper,
 
             })
+
+            Library:AddToRegistry(PropsIcon, { ImageColor3 = 'MiscColor' })
 
 
 
@@ -4395,6 +4399,7 @@ do
 
 
             local PropsFading = false
+            local PropsTransparencyCache = {}
 
             local function fadePropsWindow(visible)
                 if PropsFading then return end
@@ -4404,26 +4409,45 @@ do
                     SubOuter.Visible = true
                 end
 
-                local targetTransparency = visible and 0 or 1
                 local tweenInfo = TweenInfo.new(Library.TweenTime, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
 
                 for _, desc in next, SubOuter:GetDescendants() do
+                    if not PropsTransparencyCache[desc] then
+                        PropsTransparencyCache[desc] = {
+                            ImageTransparency = desc:IsA('ImageLabel') and desc.ImageTransparency or nil,
+                            TextTransparency = (desc:IsA('TextLabel') or desc:IsA('TextBox')) and desc.TextTransparency or nil,
+                            BackgroundTransparency = desc:IsA('GuiObject') and desc.BackgroundTransparency or nil,
+                            Transparency = desc:IsA('UIStroke') and desc.Transparency or nil
+                        }
+                    end
+
+                    local cache = PropsTransparencyCache[desc]
+
                     if desc:IsA('ImageLabel') then
-                        TweenService:Create(desc, tweenInfo, { ImageTransparency = targetTransparency, BackgroundTransparency = targetTransparency }):Play()
+                        local targetImage = visible and (cache.ImageTransparency or 0) or 1
+                        local targetBg = visible and (cache.BackgroundTransparency or desc.BackgroundTransparency) or 1
+                        TweenService:Create(desc, tweenInfo, { ImageTransparency = targetImage, BackgroundTransparency = targetBg }):Play()
                     elseif desc:IsA('TextLabel') or desc:IsA('TextBox') then
-                        TweenService:Create(desc, tweenInfo, { TextTransparency = targetTransparency, BackgroundTransparency = targetTransparency }):Play()
+                        local targetText = visible and (cache.TextTransparency or 0) or 1
+                        local targetBg = visible and (cache.BackgroundTransparency or desc.BackgroundTransparency) or 1
+                        TweenService:Create(desc, tweenInfo, { TextTransparency = targetText, BackgroundTransparency = targetBg }):Play()
                     elseif desc:IsA('Frame') or desc:IsA('ScrollingFrame') then
-                        TweenService:Create(desc, tweenInfo, { BackgroundTransparency = targetTransparency }):Play()
+                        local targetBg = visible and (cache.BackgroundTransparency or desc.BackgroundTransparency) or 1
+                        TweenService:Create(desc, tweenInfo, { BackgroundTransparency = targetBg }):Play()
                     elseif desc:IsA('UIStroke') then
-                        TweenService:Create(desc, tweenInfo, { Transparency = targetTransparency }):Play()
+                        local targetTrans = visible and (cache.Transparency or 0) or 1
+                        TweenService:Create(desc, tweenInfo, { Transparency = targetTrans }):Play()
                     end
                 end
 
-                TweenService:Create(SubOuter, tweenInfo, { BackgroundTransparency = targetTransparency }):Play()
+                local outerTarget = visible and 0 or 1
+                TweenService:Create(SubOuter, tweenInfo, { BackgroundTransparency = outerTarget }):Play()
 
                 task.wait(Library.TweenTime)
 
-                SubOuter.Visible = visible
+                if not visible then
+                    SubOuter.Visible = false
+                end
                 PropsFading = false
             end
 
