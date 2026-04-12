@@ -62,13 +62,13 @@ local Library = {
 
     FontColor = Color3.fromRGB(255, 255, 255);
 
-    MiscColor = Color3.fromRGB(186, 186, 186);
+    MiscColor = Color3.fromRGB(160, 160, 160);
 
     MainColor = Color3.fromRGB(26, 26, 26);
 
     BackgroundColor = Color3.fromRGB(27, 27, 27);
 
-    AccentColor = Color3.fromRGB(206, 146, 146);
+    AccentColor = Color3.fromRGB(0, 255, 40);
 
     OutlineColor = Color3.fromRGB(55, 55, 55);
 
@@ -378,67 +378,27 @@ function Library:MakeDraggable(Instance, Cutoff)
 
 
 
-            local HasAutomaticSize = (Instance.AutomaticSize ~= Enum.AutomaticSize.None);
+            while InputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton1) do
+
+                local TargetPos = UDim2.new(
+
+                    0,
+
+                    Mouse.X - ObjPos.X + (Instance.AbsoluteSize.X * Instance.AnchorPoint.X),
+
+                    0,
+
+                    Mouse.Y - ObjPos.Y + (Instance.AbsoluteSize.Y * Instance.AnchorPoint.Y)
+
+                );
 
 
 
-            if HasAutomaticSize then
-
-                -- For AutomaticSize frames (watermark): direct position setting
-
-                local StartPos = Instance.Position;
-
-                local MouseStart = Vector2.new(Mouse.X, Mouse.Y);
+                TweenService:Create(Instance, TweenInfo.new(Library.DragTime, Library.TweenStyle, Library.TweenDirection), { Position = TargetPos }):Play();
 
 
 
-                while InputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton1) do
-
-                    local Delta = Vector2.new(Mouse.X, Mouse.Y) - MouseStart;
-
-                    Instance.Position = UDim2.new(
-
-                        StartPos.X.Scale,
-
-                        StartPos.X.Offset + Delta.X,
-
-                        StartPos.Y.Scale,
-
-                        StartPos.Y.Offset + Delta.Y
-
-                    );
-
-                    RenderStepped:Wait();
-
-                end;
-
-            else
-
-                -- For normal frames: tween-based dragging
-
-                while InputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton1) do
-
-                    local TargetPos = UDim2.new(
-
-                        0,
-
-                        Mouse.X - ObjPos.X + (Instance.AbsoluteSize.X * Instance.AnchorPoint.X),
-
-                        0,
-
-                        Mouse.Y - ObjPos.Y + (Instance.AbsoluteSize.Y * Instance.AnchorPoint.Y)
-
-                    );
-
-
-
-                    TweenService:Create(Instance, TweenInfo.new(Library.DragTime, Library.TweenStyle, Library.TweenDirection), { Position = TargetPos }):Play();
-
-
-
-                    RenderStepped:Wait();
-
-                end;
+                RenderStepped:Wait();
 
             end;
 
@@ -939,16 +899,6 @@ function Library:UpdateColorsUsingRegistry()
             end
 
         end;
-
-    end;
-
-
-
-    -- Update gradient overlay colors if it exists
-
-    if Library.SetGradientColors then
-
-        Library:SetGradientColors(Library.AccentColor, Library.MainColor);
 
     end;
 
@@ -4202,8 +4152,6 @@ do
 
                 BorderMode = Enum.BorderMode.Inset,
 
-                Position = UDim2.new(1, -18, 0, 0),
-
                 Size = UDim2.new(0, 14, 0, 14),
 
                 ZIndex = 8,
@@ -4220,13 +4168,11 @@ do
 
                 BackgroundTransparency = 1,
 
-                Position = UDim2.new(0.5, -6, 0.5, -6),
+                Position = UDim2.new(0, 1, 0, 1),
 
-                Size = UDim2.new(0, 12, 0, 12),
+                Size = UDim2.new(1, -2, 1, -2),
 
-                Image = 'rbxassetid://7059346373',
-
-                ImageColor3 = Color3.new(1, 1, 1),
+                Image = 'rbxassetid://4492476134',
 
                 ZIndex = 9,
 
@@ -4246,7 +4192,7 @@ do
 
             PropsGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
-            PropsGui.DisplayOrder = -1
+            PropsGui.DisplayOrder = 10
 
             PropsGui.Name = 'PropertiesGui_' .. Info.Text
 
@@ -4448,94 +4394,14 @@ do
 
 
 
-            local PropsFading = false
-            local PropsTransparencyCache = {}
-
-            local function getTransparencyCache(desc)
-                if not PropsTransparencyCache[desc] then
-                    PropsTransparencyCache[desc] = {
-                        bg = desc:IsA('GuiObject') and desc.BackgroundTransparency or nil,
-                        txt = (desc:IsA('TextLabel') or desc:IsA('TextBox')) and desc.TextTransparency or nil,
-                        img = desc:IsA('ImageLabel') and desc.ImageTransparency or nil,
-                        stroke = desc:IsA('UIStroke') and desc.Transparency or nil
-                    }
-                end
-                return PropsTransparencyCache[desc]
-            end
-
-            local function fadePropsWindow(visible)
-                if PropsFading then return end
-                PropsFading = true
-
-                local tweenInfo = TweenInfo.new(Library.TweenTime, Library.TweenStyle, Library.TweenDirection)
-
-                if visible then
-                    SubOuter.Visible = true
-                    -- Cache and set all to transparent first
-                    for _, desc in next, SubOuter:GetDescendants() do
-                        local cache = getTransparencyCache(desc)
-                        if desc:IsA('GuiObject') then desc.BackgroundTransparency = 1 end
-                        if desc:IsA('TextLabel') or desc:IsA('TextBox') then desc.TextTransparency = 1 end
-                        if desc:IsA('ImageLabel') then desc.ImageTransparency = 1 end
-                        if desc:IsA('UIStroke') then desc.Transparency = 1 end
-                    end
-                    SubOuter.BackgroundTransparency = 1
-                    SubInner.BackgroundTransparency = 1
-                    -- Now fade everything in
-                    for _, desc in next, SubOuter:GetDescendants() do
-                        local cache = PropsTransparencyCache[desc]
-                        if cache then
-                            if desc:IsA('GuiObject') and cache.bg ~= nil then
-                                TweenService:Create(desc, tweenInfo, { BackgroundTransparency = cache.bg }):Play()
-                            end
-                            if (desc:IsA('TextLabel') or desc:IsA('TextBox')) and cache.txt ~= nil then
-                                TweenService:Create(desc, tweenInfo, { TextTransparency = cache.txt }):Play()
-                            end
-                            if desc:IsA('ImageLabel') and cache.img ~= nil then
-                                TweenService:Create(desc, tweenInfo, { ImageTransparency = cache.img }):Play()
-                            end
-                            if desc:IsA('UIStroke') and cache.stroke ~= nil then
-                                TweenService:Create(desc, tweenInfo, { Transparency = cache.stroke }):Play()
-                            end
-                        end
-                    end
-                    TweenService:Create(SubOuter, tweenInfo, { BackgroundTransparency = 0 }):Play()
-                    TweenService:Create(SubInner, tweenInfo, { BackgroundTransparency = 0 }):Play()
-                else
-                    -- Fade out everything
-                    for _, desc in next, SubOuter:GetDescendants() do
-                        if desc:IsA('GuiObject') then
-                            TweenService:Create(desc, tweenInfo, { BackgroundTransparency = 1 }):Play()
-                        end
-                        if desc:IsA('TextLabel') or desc:IsA('TextBox') then
-                            TweenService:Create(desc, tweenInfo, { TextTransparency = 1 }):Play()
-                        end
-                        if desc:IsA('ImageLabel') then
-                            TweenService:Create(desc, tweenInfo, { ImageTransparency = 1 }):Play()
-                        end
-                        if desc:IsA('UIStroke') then
-                            TweenService:Create(desc, tweenInfo, { Transparency = 1 }):Play()
-                        end
-                    end
-                    TweenService:Create(SubOuter, tweenInfo, { BackgroundTransparency = 1 }):Play()
-                    TweenService:Create(SubInner, tweenInfo, { BackgroundTransparency = 1 }):Play()
-                end
-
-                task.wait(Library.TweenTime)
-
-                if not visible then
-                    SubOuter.Visible = false
-                end
-                PropsFading = false
-            end
-
             IconWrapper.InputBegan:Connect(function(Input)
 
                 if Input.UserInputType ~= Enum.UserInputType.MouseButton1 then return end
 
-                local newVisible = not SubOuter.Visible
+                SubOuter.Visible = not SubOuter.Visible
 
-                if newVisible then
+                if SubOuter.Visible then
+
                     -- close any other open property windows
 
                     for _, w in next, Library.OpenedPropertyWindows do
@@ -4560,13 +4426,7 @@ do
 
                 end
 
-                fadePropsWindow(newVisible)
-
             end)
-
-            -- Store reference for auto-close/reopen with main menu
-            SubOuter:SetAttribute('PropsWindowKey', Info.Text)
-            SubOuter:SetAttribute('PropsWasOpen', false)
 
 
 
@@ -4580,7 +4440,7 @@ do
 
                 { ImageColor3 = 'AccentColor' },
 
-                { ImageColor3 = 'FontColor' }
+                { ImageColor3 = 'MiscColor' }
 
             )
 
@@ -7192,192 +7052,6 @@ function Library:CreateWindow(...)
 
 
 
-    -- Gradient Overlay System
-
-    Library.GradientOverlayEnabled = false;
-
-    Library.GradientAnimationSpeed = 1;
-
-    Library.GradientAnimationDirection = 'Left'; -- 'Left' or 'Right'
-
-
-
-    local GradientOverlay = Library:Create('Frame', {
-
-        Name = 'GradientOverlay';
-
-        BackgroundTransparency = 1;
-
-        BorderSizePixel = 0;
-
-        Position = UDim2.new(0, 2, 0, 2);
-
-        Size = UDim2.new(1, -4, 1, -4);
-
-        ZIndex = 100;
-
-        Visible = false;
-
-        Parent = Inner;
-
-    });
-
-
-
-    local OverlayGradient = Library:Create('UIGradient', {
-
-        Color = ColorSequence.new({
-
-            ColorSequenceKeypoint.new(0, Library.AccentColor),
-
-            ColorSequenceKeypoint.new(0.5, Library.MainColor),
-
-            ColorSequenceKeypoint.new(1, Library.AccentColor)
-
-        });
-
-        Rotation = 0;
-
-        Transparency = NumberSequence.new({
-
-            NumberSequenceKeypoint.new(0, 0.3),
-
-            NumberSequenceKeypoint.new(0.5, 0.7),
-
-            NumberSequenceKeypoint.new(1, 0.3)
-
-        });
-
-        Parent = GradientOverlay;
-
-    });
-
-
-
-    -- Gradient animation - rotates around UI (left, bottom, right, top loop)
-
-    local GradientConnection = nil;
-
-
-
-    function Library:SetGradientOverlayEnabled(enabled)
-
-        Library.GradientOverlayEnabled = enabled;
-
-        GradientOverlay.Visible = enabled;
-
-
-
-        if enabled and not GradientConnection then
-
-            GradientConnection = RunService.RenderStepped:Connect(function()
-
-                if not Library.GradientOverlayEnabled then return end
-
-                local t = tick() * Library.GradientAnimationSpeed;
-
-                local cycle = (t % 4); -- 0 to 4 cycle
-
-                local x, y = 0, 0;
-
-
-
-                -- Square motion: left(0) -> bottom(1) -> right(2) -> top(3) -> left(4)
-
-                if cycle < 1 then
-
-                    -- Moving from left to bottom
-
-                    x = -0.5 + (cycle * 0.5);
-
-                    y = cycle * 0.5;
-
-                elseif cycle < 2 then
-
-                    -- Moving from bottom to right
-
-                    local p = cycle - 1;
-
-                    x = p * 0.5;
-
-                    y = 0.5 - (p * 0.5);
-
-                elseif cycle < 3 then
-
-                    -- Moving from right to top
-
-                    local p = cycle - 2;
-
-                    x = 0.5 - (p * 0.5);
-
-                    y = -p * 0.5;
-
-                else
-
-                    -- Moving from top to left
-
-                    local p = cycle - 3;
-
-                    x = -p * 0.5;
-
-                    y = -0.5 + (p * 0.5);
-
-                end
-
-
-
-                if Library.GradientAnimationDirection == 'Reverse' then
-
-                    x = -x;
-
-                    y = -y;
-
-                end
-
-
-
-                OverlayGradient.Offset = Vector2.new(x, y);
-
-            end);
-
-        elseif not enabled and GradientConnection then
-
-            GradientConnection:Disconnect();
-
-            GradientConnection = nil;
-
-        end
-
-    end;
-
-
-
-    function Library:SetGradientColors(accentColor, mainColor)
-
-        OverlayGradient.Color = ColorSequence.new({
-
-            ColorSequenceKeypoint.new(0, accentColor or Library.AccentColor),
-
-            ColorSequenceKeypoint.new(0.5, mainColor or Library.MainColor),
-
-            ColorSequenceKeypoint.new(1, accentColor or Library.AccentColor)
-
-        });
-
-    end;
-
-
-
-    function Library:SetGradientAnimation(speed, direction)
-
-        Library.GradientAnimationSpeed = speed or 1;
-
-        Library.GradientAnimationDirection = direction or 'Left';
-
-    end;
-
-
-
     local WindowLabel = Library:CreateLabel({
 
         Position = UDim2.new(0, 7, 0, 0);
@@ -8581,52 +8255,6 @@ function Library:CreateWindow(...)
         Toggled = (not Toggled);
 
         ModalElement.Modal = Toggled;
-
-
-
-        -- Handle property windows auto-close/reopen
-
-        if not Toggled then
-
-            -- Menu is closing: close all property windows and remember which were open
-
-            if Library.OpenedPropertyWindows then
-
-                for key, window in next, Library.OpenedPropertyWindows do
-
-                    if window and window.Visible then
-
-                        window:SetAttribute('PropsWasOpen', true)
-
-                        window.Visible = false
-
-                    end
-
-                end
-
-            end
-
-        else
-
-            -- Menu is opening: reopen property windows that were previously open
-
-            if Library.OpenedPropertyWindows then
-
-                for key, window in next, Library.OpenedPropertyWindows do
-
-                    if window and window:GetAttribute('PropsWasOpen') then
-
-                        window.Visible = true
-
-                        window:SetAttribute('PropsWasOpen', false)
-
-                    end
-
-                end
-
-            end
-
-        end
 
 
 
