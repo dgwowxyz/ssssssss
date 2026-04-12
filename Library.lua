@@ -4152,6 +4152,8 @@ do
 
                 BorderMode = Enum.BorderMode.Inset,
 
+                Position = UDim2.new(1, -20, 0, 0),
+
                 Size = UDim2.new(0, 14, 0, 14),
 
                 ZIndex = 8,
@@ -4164,17 +4166,19 @@ do
 
 
 
-            local PropsIcon = Library:Create('ImageLabel', {
+            local PropsIcon = Library:CreateLabel({
 
                 BackgroundTransparency = 1,
 
-                Position = UDim2.new(0, 1, 0, 1),
+                Position = UDim2.new(0, 0, 0, -1),
 
-                Size = UDim2.new(1, -2, 1, -2),
+                Size = UDim2.new(1, 0, 1, 0),
 
-                Image = 'rbxasset://textures/ui/Settings.png',
+                Text = "⚙",
 
-                ImageColor3 = Library.MiscColor,
+                TextSize = 10,
+
+                TextColor3 = Library.MiscColor,
 
                 ZIndex = 9,
 
@@ -4182,7 +4186,7 @@ do
 
             })
 
-            Library:AddToRegistry(PropsIcon, { ImageColor3 = 'MiscColor' })
+            Library:AddToRegistry(PropsIcon, { TextColor3 = 'MiscColor' })
 
 
 
@@ -4399,54 +4403,26 @@ do
 
 
             local PropsFading = false
-            local PropsTransparencyCache = {}
 
             local function fadePropsWindow(visible)
                 if PropsFading then return end
                 PropsFading = true
 
+                local tweenInfo = TweenInfo.new(Library.TweenTime, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
+
                 if visible then
                     SubOuter.Visible = true
+                    SubOuter.Size = UDim2.fromOffset(0, 0)
+                    TweenService:Create(SubOuter, tweenInfo, { Size = UDim2.fromOffset(269, 300) }):Play()
+                else
+                    TweenService:Create(SubOuter, tweenInfo, { Size = UDim2.fromOffset(0, 0) }):Play()
                 end
-
-                local tweenInfo = TweenInfo.new(Library.TweenTime, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-
-                for _, desc in next, SubOuter:GetDescendants() do
-                    if not PropsTransparencyCache[desc] then
-                        PropsTransparencyCache[desc] = {
-                            ImageTransparency = desc:IsA('ImageLabel') and desc.ImageTransparency or nil,
-                            TextTransparency = (desc:IsA('TextLabel') or desc:IsA('TextBox')) and desc.TextTransparency or nil,
-                            BackgroundTransparency = desc:IsA('GuiObject') and desc.BackgroundTransparency or nil,
-                            Transparency = desc:IsA('UIStroke') and desc.Transparency or nil
-                        }
-                    end
-
-                    local cache = PropsTransparencyCache[desc]
-
-                    if desc:IsA('ImageLabel') then
-                        local targetImage = visible and (cache.ImageTransparency or 0) or 1
-                        local targetBg = visible and (cache.BackgroundTransparency or desc.BackgroundTransparency) or 1
-                        TweenService:Create(desc, tweenInfo, { ImageTransparency = targetImage, BackgroundTransparency = targetBg }):Play()
-                    elseif desc:IsA('TextLabel') or desc:IsA('TextBox') then
-                        local targetText = visible and (cache.TextTransparency or 0) or 1
-                        local targetBg = visible and (cache.BackgroundTransparency or desc.BackgroundTransparency) or 1
-                        TweenService:Create(desc, tweenInfo, { TextTransparency = targetText, BackgroundTransparency = targetBg }):Play()
-                    elseif desc:IsA('Frame') or desc:IsA('ScrollingFrame') then
-                        local targetBg = visible and (cache.BackgroundTransparency or desc.BackgroundTransparency) or 1
-                        TweenService:Create(desc, tweenInfo, { BackgroundTransparency = targetBg }):Play()
-                    elseif desc:IsA('UIStroke') then
-                        local targetTrans = visible and (cache.Transparency or 0) or 1
-                        TweenService:Create(desc, tweenInfo, { Transparency = targetTrans }):Play()
-                    end
-                end
-
-                local outerTarget = visible and 0 or 1
-                TweenService:Create(SubOuter, tweenInfo, { BackgroundTransparency = outerTarget }):Play()
 
                 task.wait(Library.TweenTime)
 
                 if not visible then
                     SubOuter.Visible = false
+                    SubOuter.Size = UDim2.fromOffset(269, 300)
                 end
                 PropsFading = false
             end
@@ -4500,9 +4476,9 @@ do
 
             Library:OnHighlight(IconWrapper, PropsIcon,
 
-                { ImageColor3 = 'AccentColor' },
+                { TextColor3 = 'AccentColor' },
 
-                { ImageColor3 = 'MiscColor' }
+                { TextColor3 = 'MiscColor' }
 
             )
 
