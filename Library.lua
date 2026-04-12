@@ -62,13 +62,13 @@ local Library = {
 
     FontColor = Color3.fromRGB(255, 255, 255);
 
-    MiscColor = Color3.fromRGB(160, 160, 160);
+    MiscColor = Color3.fromRGB(186, 186, 186);
 
     MainColor = Color3.fromRGB(26, 26, 26);
 
     BackgroundColor = Color3.fromRGB(27, 27, 27);
 
-    AccentColor = Color3.fromRGB(172, 99, 237);
+    AccentColor = Color3.fromRGB(206, 146, 146);
 
     OutlineColor = Color3.fromRGB(55, 55, 55);
 
