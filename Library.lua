@@ -7174,7 +7174,7 @@ function Library:CreateWindow(...)
 
         Size = UDim2.new(1, -4, 1, -4);
 
-        ZIndex = 0;
+        ZIndex = 100;
 
         Visible = false;
 
@@ -7196,15 +7196,15 @@ function Library:CreateWindow(...)
 
         });
 
-        Rotation = 90;
+        Rotation = 0;
 
         Transparency = NumberSequence.new({
 
-            NumberSequenceKeypoint.new(0, 0.85),
+            NumberSequenceKeypoint.new(0, 0.3),
 
-            NumberSequenceKeypoint.new(0.5, 0.95),
+            NumberSequenceKeypoint.new(0.5, 0.7),
 
-            NumberSequenceKeypoint.new(1, 0.85)
+            NumberSequenceKeypoint.new(1, 0.3)
 
         });
 
