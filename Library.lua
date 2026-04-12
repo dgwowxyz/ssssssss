@@ -360,17 +360,21 @@ function Library:MakeDraggable(Instance, Cutoff)
 
         if Input.UserInputType == Enum.UserInputType.MouseButton1 then
 
-            local ObjPos = Vector2.new(
+            local StartPos = Instance.Position;
 
-                Mouse.X - Instance.AbsolutePosition.X,
+            local MouseStart = Vector2.new(Mouse.X, Mouse.Y);
 
-                Mouse.Y - Instance.AbsolutePosition.Y
+            local DragOffset = Vector2.new(
+
+                Mouse.X - StartPos.X.Offset,
+
+                Mouse.Y - StartPos.Y.Offset
 
             );
 
 
 
-            if ObjPos.Y > (Cutoff or 40) then
+            if DragOffset.Y > (Cutoff or 40) then
 
                 return;
 
@@ -382,21 +386,19 @@ function Library:MakeDraggable(Instance, Cutoff)
 
                 local TargetPos = UDim2.new(
 
-                    0,
+                    StartPos.X.Scale,
 
-                    Mouse.X - ObjPos.X + (Instance.AbsoluteSize.X * Instance.AnchorPoint.X),
+                    Mouse.X - DragOffset.X,
 
-                    0,
+                    StartPos.Y.Scale,
 
-                    Mouse.Y - ObjPos.Y + (Instance.AbsoluteSize.Y * Instance.AnchorPoint.Y)
+                    Mouse.Y - DragOffset.Y
 
                 );
 
 
 
-                TweenService:Create(Instance, TweenInfo.new(Library.DragTime, Library.TweenStyle, Library.TweenDirection), { Position = TargetPos }):Play();
-
-
+                Instance.Position = TargetPos;
 
                 RenderStepped:Wait();
 
