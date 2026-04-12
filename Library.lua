@@ -64,9 +64,9 @@ local Library = {
 
     MiscColor = Color3.fromRGB(160, 160, 160);
 
-    MainColor = Color3.fromRGB(26, 26, 26);
+    MainColor = Color3.fromRGB(0, 0, 0);
 
-    BackgroundColor = Color3.fromRGB(27, 27, 27);
+    BackgroundColor = Color3.fromRGB(17, 17, 17);
 
     AccentColor = Color3.fromRGB(0, 255, 40);
 
