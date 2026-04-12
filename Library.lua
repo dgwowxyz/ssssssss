@@ -68,7 +68,7 @@ local Library = {
 
     BackgroundColor = Color3.fromRGB(27, 27, 27);
 
-    AccentColor = Color3.fromRGB(189, 140, 140);
+    AccentColor = Color3.fromRGB(172, 99, 237);
 
     OutlineColor = Color3.fromRGB(55, 55, 55);
 
@@ -7214,7 +7214,7 @@ function Library:CreateWindow(...)
 
 
 
-    -- Gradient animation
+    -- Gradient animation - rotates around UI (left, bottom, right, top loop)
 
     local GradientConnection = nil;
 
@@ -7236,15 +7236,67 @@ function Library:CreateWindow(...)
 
                 local t = tick() * Library.GradientAnimationSpeed;
 
-                local offset = (t % 1);
+                local cycle = (t % 4); -- 0 to 4 cycle
 
-                if Library.GradientAnimationDirection == 'Right' then
+                local x, y = 0, 0;
 
-                    offset = -offset;
+
+
+                -- Square motion: left(0) -> bottom(1) -> right(2) -> top(3) -> left(4)
+
+                if cycle < 1 then
+
+                    -- Moving from left to bottom
+
+                    x = -0.5 + (cycle * 0.5);
+
+                    y = cycle * 0.5;
+
+                elseif cycle < 2 then
+
+                    -- Moving from bottom to right
+
+                    local p = cycle - 1;
+
+                    x = p * 0.5;
+
+                    y = 0.5 - (p * 0.5);
+
+                elseif cycle < 3 then
+
+                    -- Moving from right to top
+
+                    local p = cycle - 2;
+
+                    x = 0.5 - (p * 0.5);
+
+                    y = -p * 0.5;
+
+                else
+
+                    -- Moving from top to left
+
+                    local p = cycle - 3;
+
+                    x = -p * 0.5;
+
+                    y = -0.5 + (p * 0.5);
 
                 end
 
-                OverlayGradient.Offset = Vector2.new(offset, 0);
+
+
+                if Library.GradientAnimationDirection == 'Reverse' then
+
+                    x = -x;
+
+                    y = -y;
+
+                end
+
+
+
+                OverlayGradient.Offset = Vector2.new(x, y);
 
             end);
 
