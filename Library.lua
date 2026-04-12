@@ -1098,7 +1098,7 @@ do
 
             Visible = false;
 
-            ZIndex = 15;
+            ZIndex = 200;
 
             Active = true;
 
@@ -1126,7 +1126,7 @@ do
 
             Size = UDim2.new(1, 0, 1, 0);
 
-            ZIndex = 16;
+            ZIndex = 201;
 
             Parent = PickerFrameOuter;
 
@@ -4176,23 +4176,27 @@ do
 
 
 
-            local PropsIcon = Library:Create('ImageLabel', {
+            local PropsIcon = Library:CreateLabel({
 
                 BackgroundTransparency = 1,
 
-                Position = UDim2.new(0.5, -6, 0.5, -6),
+                Position = UDim2.new(0, 0, 0, -1),
 
-                Size = UDim2.new(0, 12, 0, 12),
+                Size = UDim2.new(1, 0, 1, 0),
 
-                Image = 'rbxassetid://7059346385',
+                Text = 'cfg',
 
-                ImageColor3 = Color3.new(1, 1, 1),
+                TextSize = 8,
+
+                TextColor3 = Library.MiscColor,
 
                 ZIndex = 9,
 
                 Parent = IconWrapper,
 
             })
+
+            Library:AddToRegistry(PropsIcon, { TextColor3 = 'MiscColor' })
 
 
 
@@ -4538,9 +4542,9 @@ do
 
             Library:OnHighlight(IconWrapper, PropsIcon,
 
-                { ImageColor3 = 'AccentColor' },
+                { TextColor3 = 'AccentColor' },
 
-                { ImageColor3 = 'FontColor' }
+                { TextColor3 = 'MiscColor' }
 
             )
 
@@ -5448,7 +5452,7 @@ do
 
             Size = UDim2.new(1, 0, 1, 0);
 
-            ZIndex = 6;
+            ZIndex = 200;
 
             Parent = DropdownOuter;
 
@@ -7110,7 +7114,7 @@ function Library:CreateWindow(...)
 
         Visible = false;
 
-        ZIndex = 1;
+        ZIndex = 50;
 
         Parent = ScreenGui;
 
