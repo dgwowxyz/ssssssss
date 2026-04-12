@@ -68,7 +68,7 @@ local Library = {
 
     BackgroundColor = Color3.fromRGB(27, 27, 27);
 
-    AccentColor = Color3.fromRGB(206, 146, 146);
+    AccentColor = Color3.fromRGB(0, 255, 40);
 
     OutlineColor = Color3.fromRGB(55, 55, 55);
 
