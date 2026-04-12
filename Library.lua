@@ -904,6 +904,14 @@ function Library:UpdateColorsUsingRegistry()
 
 
 
+    -- Update gradient overlay colors if it exists
+
+    if Library.SetGradientColors then
+
+        Library:SetGradientColors(Library.AccentColor, Library.MainColor);
+
+    end;
+
 end;
 
 
@@ -1090,7 +1098,7 @@ do
 
             Visible = false;
 
-            ZIndex = 200;
+            ZIndex = 15;
 
             Active = true;
 
@@ -1118,7 +1126,7 @@ do
 
             Size = UDim2.new(1, 0, 1, 0);
 
-            ZIndex = 201;
+            ZIndex = 16;
 
             Parent = PickerFrameOuter;
 
@@ -4168,27 +4176,23 @@ do
 
 
 
-            local PropsIcon = Library:CreateLabel({
+            local PropsIcon = Library:Create('ImageLabel', {
 
                 BackgroundTransparency = 1,
 
-                Position = UDim2.new(0, 0, 0, -1),
+                Position = UDim2.new(0.5, -6, 0.5, -6),
 
-                Size = UDim2.new(1, 0, 1, 0),
+                Size = UDim2.new(0, 12, 0, 12),
 
-                Text = 'cfg',
+                Image = 'rbxassetid://7059346385',
 
-                TextSize = 8,
-
-                TextColor3 = Library.MiscColor,
+                ImageColor3 = Color3.new(1, 1, 1),
 
                 ZIndex = 9,
 
                 Parent = IconWrapper,
 
             })
-
-            Library:AddToRegistry(PropsIcon, { TextColor3 = 'MiscColor' })
 
 
 
@@ -4534,9 +4538,9 @@ do
 
             Library:OnHighlight(IconWrapper, PropsIcon,
 
-                { TextColor3 = 'AccentColor' },
+                { ImageColor3 = 'AccentColor' },
 
-                { TextColor3 = 'MiscColor' }
+                { ImageColor3 = 'FontColor' }
 
             )
 
@@ -5444,7 +5448,7 @@ do
 
             Size = UDim2.new(1, 0, 1, 0);
 
-            ZIndex = 200;
+            ZIndex = 6;
 
             Parent = DropdownOuter;
 
