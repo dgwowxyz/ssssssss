@@ -904,14 +904,6 @@ function Library:UpdateColorsUsingRegistry()
 
 
 
-    -- Update gradient overlay colors if it exists
-
-    if Library.SetGradientColors then
-
-        Library:SetGradientColors(Library.AccentColor, Library.MainColor);
-
-    end;
-
 end;
 
 
@@ -7114,7 +7106,7 @@ function Library:CreateWindow(...)
 
         Visible = false;
 
-        ZIndex = 50;
+        ZIndex = 1;
 
         Parent = ScreenGui;
 
@@ -7153,192 +7145,6 @@ function Library:CreateWindow(...)
         BorderColor3 = 'AccentColor';
 
     });
-
-
-
-    -- Gradient Overlay System
-
-    Library.GradientOverlayEnabled = false;
-
-    Library.GradientAnimationSpeed = 1;
-
-    Library.GradientAnimationDirection = 'Left'; -- 'Left' or 'Right'
-
-
-
-    local GradientOverlay = Library:Create('Frame', {
-
-        Name = 'GradientOverlay';
-
-        BackgroundTransparency = 1;
-
-        BorderSizePixel = 0;
-
-        Position = UDim2.new(0, 2, 0, 2);
-
-        Size = UDim2.new(1, -4, 1, -4);
-
-        ZIndex = 100;
-
-        Visible = false;
-
-        Parent = Inner;
-
-    });
-
-
-
-    local OverlayGradient = Library:Create('UIGradient', {
-
-        Color = ColorSequence.new({
-
-            ColorSequenceKeypoint.new(0, Library.AccentColor),
-
-            ColorSequenceKeypoint.new(0.5, Library.MainColor),
-
-            ColorSequenceKeypoint.new(1, Library.AccentColor)
-
-        });
-
-        Rotation = 0;
-
-        Transparency = NumberSequence.new({
-
-            NumberSequenceKeypoint.new(0, 0.3),
-
-            NumberSequenceKeypoint.new(0.5, 0.7),
-
-            NumberSequenceKeypoint.new(1, 0.3)
-
-        });
-
-        Parent = GradientOverlay;
-
-    });
-
-
-
-    -- Gradient animation - rotates around UI (left, bottom, right, top loop)
-
-    local GradientConnection = nil;
-
-
-
-    function Library:SetGradientOverlayEnabled(enabled)
-
-        Library.GradientOverlayEnabled = enabled;
-
-        GradientOverlay.Visible = enabled;
-
-
-
-        if enabled and not GradientConnection then
-
-            GradientConnection = RunService.RenderStepped:Connect(function()
-
-                if not Library.GradientOverlayEnabled then return end
-
-                local t = tick() * Library.GradientAnimationSpeed;
-
-                local cycle = (t % 4); -- 0 to 4 cycle
-
-                local x, y = 0, 0;
-
-
-
-                -- Square motion: left(0) -> bottom(1) -> right(2) -> top(3) -> left(4)
-
-                if cycle < 1 then
-
-                    -- Moving from left to bottom
-
-                    x = -0.5 + (cycle * 0.5);
-
-                    y = cycle * 0.5;
-
-                elseif cycle < 2 then
-
-                    -- Moving from bottom to right
-
-                    local p = cycle - 1;
-
-                    x = p * 0.5;
-
-                    y = 0.5 - (p * 0.5);
-
-                elseif cycle < 3 then
-
-                    -- Moving from right to top
-
-                    local p = cycle - 2;
-
-                    x = 0.5 - (p * 0.5);
-
-                    y = -p * 0.5;
-
-                else
-
-                    -- Moving from top to left
-
-                    local p = cycle - 3;
-
-                    x = -p * 0.5;
-
-                    y = -0.5 + (p * 0.5);
-
-                end
-
-
-
-                if Library.GradientAnimationDirection == 'Reverse' then
-
-                    x = -x;
-
-                    y = -y;
-
-                end
-
-
-
-                OverlayGradient.Offset = Vector2.new(x, y);
-
-            end);
-
-        elseif not enabled and GradientConnection then
-
-            GradientConnection:Disconnect();
-
-            GradientConnection = nil;
-
-        end
-
-    end;
-
-
-
-    function Library:SetGradientColors(accentColor, mainColor)
-
-        OverlayGradient.Color = ColorSequence.new({
-
-            ColorSequenceKeypoint.new(0, accentColor or Library.AccentColor),
-
-            ColorSequenceKeypoint.new(0.5, mainColor or Library.MainColor),
-
-            ColorSequenceKeypoint.new(1, accentColor or Library.AccentColor)
-
-        });
-
-    end;
-
-
-
-    function Library:SetGradientAnimation(speed, direction)
-
-        Library.GradientAnimationSpeed = speed or 1;
-
-        Library.GradientAnimationDirection = direction or 'Left';
-
-    end;
 
 
 
