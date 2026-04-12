@@ -90,9 +90,9 @@ local Library = {
 
     TweenDirection = Enum.EasingDirection.Out,
 
-    TweenTime = 0.15,
+    TweenTime = 0.17,
 
-    DragTime = 0.08,
+    DragTime = 0.2,
 
 
 
