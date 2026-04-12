@@ -360,21 +360,19 @@ function Library:MakeDraggable(Instance, Cutoff)
 
         if Input.UserInputType == Enum.UserInputType.MouseButton1 then
 
-            local StartPos = Instance.Position;
+            local StartMouse = Vector2.new(Mouse.X, Mouse.Y);
 
-            local MouseStart = Vector2.new(Mouse.X, Mouse.Y);
+            local StartOffset = Vector2.new(
 
-            local DragOffset = Vector2.new(
+                Mouse.X - Instance.AbsolutePosition.X,
 
-                Mouse.X - StartPos.X.Offset,
-
-                Mouse.Y - StartPos.Y.Offset
+                Mouse.Y - Instance.AbsolutePosition.Y
 
             );
 
 
 
-            if DragOffset.Y > (Cutoff or 40) then
+            if StartOffset.Y > (Cutoff or 40) then
 
                 return;
 
@@ -382,17 +380,23 @@ function Library:MakeDraggable(Instance, Cutoff)
 
 
 
+            local StartPos = Instance.Position;
+
+
+
             while InputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton1) do
+
+                local Delta = Vector2.new(Mouse.X, Mouse.Y) - StartMouse;
 
                 local TargetPos = UDim2.new(
 
                     StartPos.X.Scale,
 
-                    Mouse.X - DragOffset.X,
+                    StartPos.X.Offset + Delta.X,
 
                     StartPos.Y.Scale,
 
-                    Mouse.Y - DragOffset.Y
+                    StartPos.Y.Offset + Delta.Y
 
                 );
 
