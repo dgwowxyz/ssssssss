@@ -4408,21 +4408,23 @@ do
                 if PropsFading then return end
                 PropsFading = true
 
-                local tweenInfo = TweenInfo.new(Library.TweenTime, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
+                local tweenInfo = TweenInfo.new(Library.TweenTime, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
 
                 if visible then
+                    SubOuter.BackgroundTransparency = 1
+                    SubInner.BackgroundTransparency = 1
                     SubOuter.Visible = true
-                    SubOuter.Size = UDim2.fromOffset(0, 0)
-                    TweenService:Create(SubOuter, tweenInfo, { Size = UDim2.fromOffset(269, 300) }):Play()
+                    TweenService:Create(SubOuter, tweenInfo, { BackgroundTransparency = 0 }):Play()
+                    TweenService:Create(SubInner, tweenInfo, { BackgroundTransparency = 0 }):Play()
                 else
-                    TweenService:Create(SubOuter, tweenInfo, { Size = UDim2.fromOffset(0, 0) }):Play()
+                    TweenService:Create(SubOuter, tweenInfo, { BackgroundTransparency = 1 }):Play()
+                    TweenService:Create(SubInner, tweenInfo, { BackgroundTransparency = 1 }):Play()
                 end
 
                 task.wait(Library.TweenTime)
 
                 if not visible then
                     SubOuter.Visible = false
-                    SubOuter.Size = UDim2.fromOffset(269, 300)
                 end
                 PropsFading = false
             end
