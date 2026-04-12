@@ -4184,7 +4184,7 @@ do
 
                 Size = UDim2.new(0, 12, 0, 12),
 
-                Image = 'rbxassetid://7059346385',
+                Image = 'rbxassetid://7059346373',
 
                 ImageColor3 = Color3.new(1, 1, 1),
 
