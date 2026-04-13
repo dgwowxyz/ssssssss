@@ -5025,6 +5025,22 @@ do
         });
         print('DEBUG: Test box created at 125,125');
 
+        -- DEBUG: Flag status text
+        local debugText = Library:Create('TextLabel', {
+            Name = 'DebugFlags',
+            Size = UDim2.new(1, 0, 0, 60),
+            Position = UDim2.new(0, 0, 0, 0),
+            BackgroundTransparency = 0.5,
+            BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+            TextColor3 = Color3.fromRGB(255, 255, 0),
+            FontFace = Library.Font,
+            TextSize = 10,
+            TextXAlignment = Enum.TextXAlignment.Left,
+            TextYAlignment = Enum.TextYAlignment.Top,
+            ZIndex = 10001,
+            Parent = ESPOverlay,
+        });
+
         -- Box
         previewElements.box = Library:Create('Frame', {
             Name = 'Box',
@@ -5135,6 +5151,14 @@ do
         function Preview:UpdateESP(flags, playerName)
             if not self.Clone or not self.Clone.PrimaryPart then return end;
 
+            -- Update debug text with flag status
+            debugText.Text = string.format('B:%s N:%s HB:%s HT:%s D:%s', 
+                tostring(flags.Boxes), 
+                tostring(flags.Names), 
+                tostring(flags.Healthbar), 
+                tostring(flags.Health_Text), 
+                tostring(flags.Distance));
+
             local hrp = self.Clone:FindFirstChild('HumanoidRootPart') or self.Clone:FindFirstChild('Torso');
             if not hrp then return end;
 
@@ -5158,34 +5182,23 @@ do
             local head2d = worldToViewport(headPos);
             local foot2d = worldToViewport(footPos);
 
-            -- Debug: print coordinates every 60 frames
-            if tick() % 1 < 0.05 then
-                print('Head2D:', head2d.X, head2d.Y, '| Foot2D:', foot2d.X, foot2d.Y);
-                print('Viewport Size:', Viewport.AbsoluteSize.X, Viewport.AbsoluteSize.Y);
-                print('Viewport Pos:', Viewport.AbsolutePosition.X, Viewport.AbsolutePosition.Y);
-            end;
-
             -- Always show ESP if character exists (ignore on-screen check for preview)
             if true then
                 local boxHeight = math.abs(head2d.Y - foot2d.Y);
                 local boxWidth = boxHeight * 0.6;
                 local boxCenter = Vector2.new((head2d.X + foot2d.X) / 2, (head2d.Y + foot2d.Y) / 2);
 
-                -- Box
-                previewElements.box.Visible = flags.Boxes or false;
-                if previewElements.box.Visible then
-                    previewElements.box.Size = UDim2.fromOffset(math.max(10, boxWidth), math.max(10, boxHeight));
-                    previewElements.box.Position = UDim2.fromOffset(boxCenter.X - boxWidth/2, boxCenter.Y - boxHeight/2);
-                    previewElements.boxOutline.Color = flags.Box_Color and flags.Box_Color.Color or Color3.fromRGB(255, 255, 255);
-                end;
+                -- Box (DEBUG: always show when character exists)
+                previewElements.box.Visible = true; -- DEBUG: always show
+                previewElements.box.Size = UDim2.fromOffset(100, 150); -- DEBUG: fixed size
+                previewElements.box.Position = UDim2.fromOffset(90, 65); -- DEBUG: center-ish of 280x280
+                previewElements.boxOutline.Color = Color3.fromRGB(255, 0, 0); -- DEBUG: red
 
-                -- Name
-                previewElements.name.Visible = flags.Names or false;
-                if previewElements.name.Visible then
-                    previewElements.name.Text = playerName or 'Player';
-                    previewElements.name.TextColor3 = flags.Name_Gradient and Color3.new(1,1,1) or (flags.Name_Color and flags.Name_Color.Color or Color3.fromRGB(255, 255, 255));
-                    previewElements.name.Position = UDim2.fromOffset(boxCenter.X, head2d.Y - 20);
-                end;
+                -- Name (DEBUG: always show)
+                previewElements.name.Visible = true; -- DEBUG: always show
+                previewElements.name.Text = playerName or 'Player';
+                previewElements.name.TextColor3 = Color3.fromRGB(255, 255, 255); -- DEBUG: white
+                previewElements.name.Position = UDim2.fromOffset(140, 50); -- DEBUG: fixed position
 
                 -- Healthbar
                 previewElements.healthbar.Visible = flags.Healthbar or false;
