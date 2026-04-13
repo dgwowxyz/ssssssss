@@ -4998,6 +4998,7 @@ do
             Position = UDim2.new(0, 1, 0, 1),
             BackgroundTransparency = 1,
             BorderSizePixel = 0,
+            ClipsDescendants = false, -- Allow ESP to render fully
             ZIndex = 10, -- Higher than Viewport
             Parent = PreviewFrame, -- Sibling to Viewport, on top
         });
