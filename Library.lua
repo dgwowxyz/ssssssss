@@ -5027,6 +5027,7 @@ do
         end;
 
         Groupbox:AddBlank(Info.Height or 200);
+        Groupbox:Resize();
 
         return Preview;
     end;
