@@ -5208,7 +5208,6 @@ do
                     previewElements.distance.TextColor3 = Color3.fromRGB(255, 255, 255);
                     previewElements.distance.Position = UDim2.fromOffset(boxCenterX, boxTop + boxHeight + 10);
                 end;
-            end;
         end;
 
         Groupbox:AddBlank(5);
