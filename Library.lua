@@ -5143,10 +5143,11 @@ do
                 return relativePos, onScreen;
             end;
 
-            local head2d, headVisible = worldToViewport(headPos);
-            local foot2d, footVisible = worldToViewport(footPos);
+            local head2d = worldToViewport(headPos);
+            local foot2d = worldToViewport(footPos);
 
-            if headVisible and footVisible then
+            -- Always show ESP if character exists (ignore on-screen check for preview)
+            if true then
                 local boxHeight = math.abs(head2d.Y - foot2d.Y);
                 local boxWidth = boxHeight * 0.6;
                 local boxCenter = Vector2.new((head2d.X + foot2d.X) / 2, (head2d.Y + foot2d.Y) / 2);
@@ -5214,13 +5215,6 @@ do
                     previewElements.distance.Text = '100' .. unit;
                     previewElements.distance.TextColor3 = flags.Distance_Gradient and Color3.new(1,1,1) or (flags.Distance_Color and flags.Distance_Color.Color or Color3.fromRGB(255, 255, 255));
                     previewElements.distance.Position = UDim2.fromOffset(boxCenter.X, foot2d.Y + (flags.Distance_Gap or 5));
-                end;
-            else
-                -- Hide all when off-screen
-                for _, el in pairs(previewElements) do
-                    if typeof(el) == 'Instance' and el:IsA('GuiObject') then
-                        el.Visible = false;
-                    end;
                 end;
             end;
         end;
