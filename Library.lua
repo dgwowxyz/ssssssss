@@ -4991,10 +4991,22 @@ do
         });
         Viewport.CurrentCamera = Camera;
 
+        -- ESP Overlay Frame (for 2D ESP elements on top of 3D preview)
+        local ESPOverlay = Library:Create('Frame', {
+            Name = 'ESPOverlay',
+            Size = UDim2.new(1, -2, 1, -2),
+            Position = UDim2.new(0, 1, 0, 1),
+            BackgroundTransparency = 1,
+            BorderSizePixel = 0,
+            ZIndex = 10, -- Higher than Viewport
+            Parent = PreviewFrame, -- Sibling to Viewport, on top
+        });
+
         Preview.Instance = PreviewFrame;
         Preview.Viewport = Viewport;
         Preview.WorldModel = WorldModel;
         Preview.Camera = Camera;
+        Preview.ESPOverlay = ESPOverlay;
         Preview.Clone = nil;
 
         function Preview:UpdateCharacter(char)
