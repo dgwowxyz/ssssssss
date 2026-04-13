@@ -5138,13 +5138,20 @@ do
             -- Project to viewport
             local function worldToViewport(worldPos)
                 local screenPos, onScreen = cam:WorldToViewportPoint(worldPos);
-                local overlayAbsPos = overlay.AbsolutePosition;
-                local relativePos = Vector2.new(screenPos.X, screenPos.Y) - overlayAbsPos;
-                return relativePos, onScreen;
+                local viewportAbsPos = Viewport.AbsolutePosition;
+                local relativePos = Vector2.new(screenPos.X - viewportAbsPos.X, screenPos.Y - viewportAbsPos.Y);
+                return relativePos;
             end;
 
             local head2d = worldToViewport(headPos);
             local foot2d = worldToViewport(footPos);
+
+            -- Debug: print coordinates every 60 frames
+            if tick() % 1 < 0.05 then
+                print('Head2D:', head2d.X, head2d.Y, '| Foot2D:', foot2d.X, foot2d.Y);
+                print('Viewport Size:', Viewport.AbsoluteSize.X, Viewport.AbsoluteSize.Y);
+                print('Viewport Pos:', Viewport.AbsolutePosition.X, Viewport.AbsolutePosition.Y);
+            end;
 
             -- Always show ESP if character exists (ignore on-screen check for preview)
             if true then
