@@ -4991,107 +4991,11 @@ do
         });
         Viewport.CurrentCamera = Camera;
 
-        -- ESP Overlay Frame (for 2D ESP elements on top of 3D preview)
-        local ESPOverlay = Library:Create('Frame', {
-            Name = 'ESPOverlay',
-            Size = UDim2.new(1, -2, 1, -2),
-            Position = UDim2.new(0, 1, 0, 1),
-            BackgroundTransparency = 1,
-            BorderSizePixel = 0,
-            ClipsDescendants = false, -- Allow ESP to render fully
-            ZIndex = 10, -- Higher than Viewport
-            Parent = PreviewFrame, -- Sibling to Viewport, on top
-        });
-
         Preview.Instance = PreviewFrame;
         Preview.Viewport = Viewport;
         Preview.WorldModel = WorldModel;
         Preview.Camera = Camera;
-        Preview.ESPOverlay = ESPOverlay;
         Preview.Clone = nil;
-
-        -- ESP Elements for preview
-        local previewElements = {};
-
-        -- DEBUG elements removed for testing
-
-        -- Box
-        previewElements.box = Library:Create('Frame', {
-            Name = 'Box',
-            BackgroundTransparency = 0, -- DEBUG: solid background
-            BackgroundColor3 = Color3.fromRGB(0, 100, 200), -- DEBUG: blue background
-            BorderSizePixel = 0,
-            Visible = true, -- DEBUG: visible
-            ZIndex = 9999,
-            Parent = ESPOverlay,
-        });
-        previewElements.boxOutline = Library:Create('UIStroke', {
-            Thickness = 2,
-            Color = Color3.fromRGB(255, 0, 0), -- DEBUG: red outline
-            Parent = previewElements.box,
-        });
-
-        -- Name
-        previewElements.name = Library:Create('TextLabel', {
-            Name = 'Name',
-            BackgroundTransparency = 1,
-            FontFace = Library.Font,
-            TextSize = 13,
-            Text = 'Player',
-            TextColor3 = Color3.fromRGB(255, 255, 255),
-            TextStrokeTransparency = 1,
-            TextXAlignment = Enum.TextXAlignment.Center,
-            Visible = false,
-            ZIndex = 9999,
-            Parent = ESPOverlay,
-        });
-
-        -- Healthbar
-        previewElements.healthbar = Library:Create('Frame', {
-            Name = 'Healthbar',
-            BackgroundColor3 = Color3.fromRGB(50, 50, 50),
-            BorderSizePixel = 0,
-            Visible = false,
-            ZIndex = 9999,
-            Parent = ESPOverlay,
-        });
-        previewElements.healthbarFill = Library:Create('Frame', {
-            Name = 'Fill',
-            BackgroundColor3 = Color3.fromRGB(0, 255, 0),
-            BorderSizePixel = 0,
-            Size = UDim2.new(1, 0, 1, 0),
-            Parent = previewElements.healthbar,
-        });
-
-        -- Health text
-        previewElements.healthText = Library:Create('TextLabel', {
-            Name = 'HealthText',
-            BackgroundTransparency = 1,
-            FontFace = Library.Font,
-            TextSize = 12,
-            Text = '100%',
-            TextColor3 = Color3.fromRGB(255, 255, 255),
-            TextStrokeTransparency = 1,
-            TextXAlignment = Enum.TextXAlignment.Center,
-            Visible = false,
-            ZIndex = 9999,
-            Parent = ESPOverlay,
-        });
-
-        -- Distance
-        previewElements.distance = Library:Create('TextLabel', {
-            Name = 'Distance',
-            BackgroundTransparency = 1,
-            FontFace = Library.Font,
-            TextSize = 12,
-            Text = '100m',
-            TextColor3 = Color3.fromRGB(255, 255, 255),
-            TextStrokeTransparency = 1,
-            TextXAlignment = Enum.TextXAlignment.Center,
-            Visible = false,
-            ZIndex = 9999,
-            Parent = ESPOverlay,
-        });
 
         function Preview:UpdateCharacter(char)
             if self.Clone then
@@ -5120,66 +5024,6 @@ do
             end;
 
             self.Clone = clone;
-        end;
-
-        -- Update ESP based on flags
-        function Preview:UpdateESP(flags, playerName)
-            if not self.Clone or not self.Clone.PrimaryPart then return end;
-
-            -- Use FIXED positions for 280x280 preview (character is always in center)
-            -- Box: 100x150 centered at (140, 140)
-            local boxWidth = 100;
-            local boxHeight = 150;
-            local boxCenterX = 140;
-            local boxCenterY = 140;
-            local boxLeft = boxCenterX - boxWidth/2;
-            local boxTop = boxCenterY - boxHeight/2;
-            local barX = boxLeft + boxWidth + 5; -- For health text positioning
-
-            -- Box
-            previewElements.box.Visible = flags.Boxes or false;
-            if previewElements.box.Visible then
-                previewElements.box.Size = UDim2.fromOffset(boxWidth, boxHeight);
-                previewElements.box.Position = UDim2.fromOffset(boxLeft, boxTop);
-                previewElements.boxOutline.Color = Color3.fromRGB(255, 255, 255);
-            end;
-
-            -- Name (above box)
-            previewElements.name.Visible = flags.Names or false;
-            if previewElements.name.Visible then
-                previewElements.name.Text = playerName or 'Player';
-                previewElements.name.TextColor3 = Color3.fromRGB(255, 255, 255);
-                previewElements.name.Position = UDim2.fromOffset(boxCenterX, boxTop - 20);
-            end;
-
-            -- Healthbar (to the right of box)
-            previewElements.healthbar.Visible = flags.Healthbar or false;
-            if previewElements.healthbar.Visible then
-                local barWidth = 4;
-                local barHeight = boxHeight;
-                local barY = boxTop;
-                previewElements.healthbar.Size = UDim2.fromOffset(barWidth, barHeight);
-                previewElements.healthbar.Position = UDim2.fromOffset(barX, barY);
-                previewElements.healthbarFill.Size = UDim2.new(1, 0, 1, 0);
-                previewElements.healthbarFill.BackgroundColor3 = Color3.fromRGB(0, 255, 0);
-            end;
-
-                -- Health Text (to the right of healthbar)
-                previewElements.healthText.Visible = flags.Health_Text or false;
-                if previewElements.healthText.Visible then
-                    previewElements.healthText.Text = '100%';
-                    previewElements.healthText.TextColor3 = Color3.fromRGB(255, 255, 255);
-                    previewElements.healthText.Position = UDim2.fromOffset(barX + 15, boxCenterY);
-                end;
-
-                -- Distance (below box)
-                previewElements.distance.Visible = flags.Distance or false;
-                if previewElements.distance.Visible then
-                    local unit = flags.Distance_Type == 'Meters' and 'm' or 'st';
-                    previewElements.distance.Text = '100' .. unit;
-                    previewElements.distance.TextColor3 = Color3.fromRGB(255, 255, 255);
-                    previewElements.distance.Position = UDim2.fromOffset(boxCenterX, boxTop + boxHeight + 10);
-                end;
         end;
 
         Groupbox:AddBlank(5);
