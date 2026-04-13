@@ -5013,6 +5013,18 @@ do
         -- ESP Elements for preview
         local previewElements = {};
 
+        -- DEBUG: Red test square at center
+        local testBox = Library:Create('Frame', {
+            Name = 'TestCenter',
+            Size = UDim2.fromOffset(50, 50),
+            Position = UDim2.fromOffset(125, 125), -- Center of 280x280
+            BackgroundColor3 = Color3.fromRGB(255, 0, 0),
+            BorderSizePixel = 0,
+            ZIndex = 10000,
+            Parent = ESPOverlay,
+        });
+        print('DEBUG: Test box created at 125,125');
+
         -- Box
         previewElements.box = Library:Create('Frame', {
             Name = 'Box',
@@ -5023,8 +5035,8 @@ do
             Parent = ESPOverlay,
         });
         previewElements.boxOutline = Library:Create('UIStroke', {
-            Thickness = 1,
-            Color = Color3.fromRGB(255, 255, 255),
+            Thickness = 2,
+            Color = Color3.fromRGB(255, 0, 0),
             Parent = previewElements.box,
         });
 
