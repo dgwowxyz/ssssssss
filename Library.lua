@@ -5044,15 +5044,16 @@ do
         -- Box
         previewElements.box = Library:Create('Frame', {
             Name = 'Box',
-            BackgroundTransparency = 1,
+            BackgroundTransparency = 0, -- DEBUG: solid background
+            BackgroundColor3 = Color3.fromRGB(0, 100, 200), -- DEBUG: blue background
             BorderSizePixel = 0,
-            Visible = false,
+            Visible = true, -- DEBUG: visible
             ZIndex = 9999,
             Parent = ESPOverlay,
         });
         previewElements.boxOutline = Library:Create('UIStroke', {
             Thickness = 2,
-            Color = Color3.fromRGB(255, 0, 0),
+            Color = Color3.fromRGB(255, 0, 0), -- DEBUG: red outline
             Parent = previewElements.box,
         });
 
@@ -5159,94 +5160,53 @@ do
                 tostring(flags.Health_Text), 
                 tostring(flags.Distance));
 
-            local hrp = self.Clone:FindFirstChild('HumanoidRootPart') or self.Clone:FindFirstChild('Torso');
-            if not hrp then return end;
+            -- Use FIXED positions for 280x280 preview (character is always in center)
+            -- Box: 100x150 centered at (140, 140)
+            local boxWidth = 100;
+            local boxHeight = 150;
+            local boxCenterX = 140;
+            local boxCenterY = 140;
+            local boxLeft = boxCenterX - boxWidth/2;
+            local boxTop = boxCenterY - boxHeight/2;
 
-            local cam = self.Camera;
-            local overlay = self.ESPOverlay;
+            -- Box (always visible for debug)
+            previewElements.box.Visible = true;
+            previewElements.box.Size = UDim2.fromOffset(boxWidth, boxHeight);
+            previewElements.box.Position = UDim2.fromOffset(boxLeft, boxTop);
+            previewElements.boxOutline.Color = Color3.fromRGB(255, 0, 0);
 
-            -- Get character bounds
-            local charPos = hrp.Position;
-            local upVec = hrp.CFrame.UpVector;
-            local headPos = charPos + upVec * 1.8;
-            local footPos = charPos - upVec * 2.5;
+            -- Name (above box)
+            previewElements.name.Visible = true;
+            previewElements.name.Text = playerName or 'Player';
+            previewElements.name.TextColor3 = Color3.fromRGB(255, 255, 255);
+            previewElements.name.Position = UDim2.fromOffset(boxCenterX, boxTop - 20);
 
-            -- Project to viewport
-            local function worldToViewport(worldPos)
-                local screenPos, onScreen = cam:WorldToViewportPoint(worldPos);
-                local viewportAbsPos = Viewport.AbsolutePosition;
-                local relativePos = Vector2.new(screenPos.X - viewportAbsPos.X, screenPos.Y - viewportAbsPos.Y);
-                return relativePos;
-            end;
+            -- Healthbar (to the right of box)
+            previewElements.healthbar.Visible = true;
+            local barWidth = 4;
+            local barHeight = boxHeight;
+            local barX = boxLeft + boxWidth + 5;
+            local barY = boxTop;
+            previewElements.healthbar.Size = UDim2.fromOffset(barWidth, barHeight);
+            previewElements.healthbar.Position = UDim2.fromOffset(barX, barY);
+            previewElements.healthbarFill.Size = UDim2.new(1, 0, 1, 0);
+            previewElements.healthbarFill.BackgroundColor3 = Color3.fromRGB(0, 255, 0);
 
-            local head2d = worldToViewport(headPos);
-            local foot2d = worldToViewport(footPos);
-
-            -- Always show ESP if character exists (ignore on-screen check for preview)
-            if true then
-                local boxHeight = math.abs(head2d.Y - foot2d.Y);
-                local boxWidth = boxHeight * 0.6;
-                local boxCenter = Vector2.new((head2d.X + foot2d.X) / 2, (head2d.Y + foot2d.Y) / 2);
-
-                -- Box (DEBUG: always show when character exists)
-                previewElements.box.Visible = true; -- DEBUG: always show
-                previewElements.box.Size = UDim2.fromOffset(100, 150); -- DEBUG: fixed size
-                previewElements.box.Position = UDim2.fromOffset(90, 65); -- DEBUG: center-ish of 280x280
-                previewElements.boxOutline.Color = Color3.fromRGB(255, 0, 0); -- DEBUG: red
-
-                -- Name (DEBUG: always show)
-                previewElements.name.Visible = true; -- DEBUG: always show
-                previewElements.name.Text = playerName or 'Player';
-                previewElements.name.TextColor3 = Color3.fromRGB(255, 255, 255); -- DEBUG: white
-                previewElements.name.Position = UDim2.fromOffset(140, 50); -- DEBUG: fixed position
-
-                -- Healthbar
-                previewElements.healthbar.Visible = flags.Healthbar or false;
-                if previewElements.healthbar.Visible then
-                    local hpPercent = 1;
-                    local barWidth = math.max(2, flags.Healthbar_Thickness or 4);
-                    local barHeight = math.max(10, boxHeight);
-                    local hpPos;
-                    if flags.Healthbar_Position == 'Right' then
-                        hpPos = Vector2.new(boxCenter.X + boxWidth/2 + (flags.Healthbar_Gap or 4), boxCenter.Y);
-                    else
-                        hpPos = Vector2.new(boxCenter.X - boxWidth/2 - (flags.Healthbar_Gap or 4) - barWidth, boxCenter.Y);
-                    end;
-
-                    previewElements.healthbar.Size = UDim2.fromOffset(barWidth, barHeight);
-                    previewElements.healthbar.Position = UDim2.fromOffset(hpPos.X, hpPos.Y - barHeight/2);
-                    previewElements.healthbarFill.Size = UDim2.new(1, 0, hpPercent, 0);
-                    previewElements.healthbarFill.Position = UDim2.new(0, 0, 1 - hpPercent, 0);
-
-                    if flags.Healthbar_Gradient then
-                        previewElements.healthbarFill.BackgroundColor3 = flags.Health_High and flags.Health_High.Color or Color3.fromRGB(0, 255, 0);
-                    else
-                        local lowColor = flags.Health_Low and flags.Health_Low.Color or Color3.fromRGB(255, 0, 0);
-                        local highColor = flags.Health_High and flags.Health_High.Color or Color3.fromRGB(0, 255, 0);
-                        previewElements.healthbarFill.BackgroundColor3 = highColor:Lerp(lowColor, 1 - hpPercent);
-                    end;
-                end;
-
-                -- Health Text
+                -- Health Text (to the right of healthbar)
                 previewElements.healthText.Visible = flags.Health_Text or false;
                 if previewElements.healthText.Visible then
                     previewElements.healthText.Text = '100%';
-                    previewElements.healthText.TextColor3 = flags.Health_Text_Dynamic and (flags.Health_High and flags.Health_High.Color or Color3.fromRGB(0, 255, 0)) or (flags.Health_Text_Color and flags.Health_Text_Color.Color or Color3.fromRGB(255, 255, 255));
-                    local txtGap = flags.Health_Text_Gap or 15;
-                    if flags.Healthbar_Position == 'Right' then
-                        previewElements.healthText.Position = UDim2.fromOffset(boxCenter.X + boxWidth/2 + txtGap, boxCenter.Y);
-                    else
-                        previewElements.healthText.Position = UDim2.fromOffset(boxCenter.X - boxWidth/2 - txtGap, boxCenter.Y);
-                    end;
+                    previewElements.healthText.TextColor3 = Color3.fromRGB(255, 255, 255);
+                    previewElements.healthText.Position = UDim2.fromOffset(barX + 15, boxCenterY);
                 end;
 
-                -- Distance
+                -- Distance (below box)
                 previewElements.distance.Visible = flags.Distance or false;
                 if previewElements.distance.Visible then
                     local unit = flags.Distance_Type == 'Meters' and 'm' or 'st';
                     previewElements.distance.Text = '100' .. unit;
-                    previewElements.distance.TextColor3 = flags.Distance_Gradient and Color3.new(1,1,1) or (flags.Distance_Color and flags.Distance_Color.Color or Color3.fromRGB(255, 255, 255));
-                    previewElements.distance.Position = UDim2.fromOffset(boxCenter.X, foot2d.Y + (flags.Distance_Gap or 5));
+                    previewElements.distance.TextColor3 = Color3.fromRGB(255, 255, 255);
+                    previewElements.distance.Position = UDim2.fromOffset(boxCenterX, boxTop + boxHeight + 10);
                 end;
             end;
         end;
