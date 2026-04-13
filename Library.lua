@@ -4952,6 +4952,87 @@ do
 
 
 
+    function Funcs:AddPreview(Idx, Info)
+        local Preview = { }
+
+        local Groupbox = self;
+        local Container = Groupbox.Container;
+
+        local PreviewFrame = Library:Create('Frame', {
+            BackgroundColor3 = Library.BackgroundColor,
+            BorderColor3 = Library.OutlineColor,
+            BorderMode = Enum.BorderMode.Inset,
+            Size = UDim2.new(1, -4, 0, Info.Height or 200),
+            ZIndex = 5,
+            Parent = Container,
+        });
+
+        Library:AddToRegistry(PreviewFrame, {
+            BackgroundColor3 = 'BackgroundColor',
+            BorderColor3 = 'OutlineColor',
+        });
+
+        local Viewport = Library:Create('ViewportFrame', {
+            Size = UDim2.new(1, -2, 1, -2),
+            Position = UDim2.new(0, 1, 0, 1),
+            BackgroundColor3 = Color3.fromRGB(20, 20, 20),
+            BackgroundTransparency = 0,
+            BorderSizePixel = 0,
+            ZIndex = 6,
+            Parent = PreviewFrame,
+        });
+
+        local WorldModel = Library:Create('WorldModel', {
+            Parent = Viewport,
+        });
+
+        local Camera = Library:Create('Camera', {
+            Parent = Viewport,
+        });
+        Viewport.CurrentCamera = Camera;
+
+        Preview.Instance = PreviewFrame;
+        Preview.Viewport = Viewport;
+        Preview.WorldModel = WorldModel;
+        Preview.Camera = Camera;
+        Preview.Clone = nil;
+
+        function Preview:UpdateCharacter(char)
+            if self.Clone then
+                self.Clone:Destroy();
+            end;
+
+            if not char then return end;
+
+            char.Archivable = true;
+            local clone = char:Clone();
+            clone.Parent = WorldModel;
+
+            for _, v in ipairs(clone:GetDescendants()) do
+                if v:IsA('Script') or v:IsA('LocalScript') then
+                    v:Destroy();
+                end;
+                if v:IsA('BasePart') then
+                    v.CanCollide = false;
+                end;
+            end;
+
+            local hrp = clone:FindFirstChild('HumanoidRootPart') or clone:FindFirstChild('Torso');
+            if hrp then
+                clone.PrimaryPart = hrp;
+                hrp.CFrame = CFrame.new(0, 0, 0);
+            end;
+
+            self.Clone = clone;
+        end;
+
+        Groupbox:AddBlank(Info.Height or 200);
+
+        return Preview;
+    end;
+
+
+
     function Funcs:AddSlider(Idx, Info)
 
         assert(Info.Default, 'AddSlider: Missing default value.');
