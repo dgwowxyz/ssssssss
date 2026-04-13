@@ -5026,7 +5026,7 @@ do
             self.Clone = clone;
         end;
 
-        Groupbox:AddBlank(Info.Height or 200);
+        Groupbox:AddBlank(5);
         Groupbox:Resize();
 
         return Preview;
