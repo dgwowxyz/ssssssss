@@ -5134,29 +5134,35 @@ do
             local boxCenterY = 140;
             local boxLeft = boxCenterX - boxWidth/2;
             local boxTop = boxCenterY - boxHeight/2;
+            local barX = boxLeft + boxWidth + 5; -- For health text positioning
 
-            -- Box (always visible for debug)
-            previewElements.box.Visible = true;
-            previewElements.box.Size = UDim2.fromOffset(boxWidth, boxHeight);
-            previewElements.box.Position = UDim2.fromOffset(boxLeft, boxTop);
-            previewElements.boxOutline.Color = Color3.fromRGB(255, 0, 0);
+            -- Box
+            previewElements.box.Visible = flags.Boxes or false;
+            if previewElements.box.Visible then
+                previewElements.box.Size = UDim2.fromOffset(boxWidth, boxHeight);
+                previewElements.box.Position = UDim2.fromOffset(boxLeft, boxTop);
+                previewElements.boxOutline.Color = Color3.fromRGB(255, 255, 255);
+            end;
 
             -- Name (above box)
-            previewElements.name.Visible = true;
-            previewElements.name.Text = playerName or 'Player';
-            previewElements.name.TextColor3 = Color3.fromRGB(255, 255, 255);
-            previewElements.name.Position = UDim2.fromOffset(boxCenterX, boxTop - 20);
+            previewElements.name.Visible = flags.Names or false;
+            if previewElements.name.Visible then
+                previewElements.name.Text = playerName or 'Player';
+                previewElements.name.TextColor3 = Color3.fromRGB(255, 255, 255);
+                previewElements.name.Position = UDim2.fromOffset(boxCenterX, boxTop - 20);
+            end;
 
             -- Healthbar (to the right of box)
-            previewElements.healthbar.Visible = true;
-            local barWidth = 4;
-            local barHeight = boxHeight;
-            local barX = boxLeft + boxWidth + 5;
-            local barY = boxTop;
-            previewElements.healthbar.Size = UDim2.fromOffset(barWidth, barHeight);
-            previewElements.healthbar.Position = UDim2.fromOffset(barX, barY);
-            previewElements.healthbarFill.Size = UDim2.new(1, 0, 1, 0);
-            previewElements.healthbarFill.BackgroundColor3 = Color3.fromRGB(0, 255, 0);
+            previewElements.healthbar.Visible = flags.Healthbar or false;
+            if previewElements.healthbar.Visible then
+                local barWidth = 4;
+                local barHeight = boxHeight;
+                local barY = boxTop;
+                previewElements.healthbar.Size = UDim2.fromOffset(barWidth, barHeight);
+                previewElements.healthbar.Position = UDim2.fromOffset(barX, barY);
+                previewElements.healthbarFill.Size = UDim2.new(1, 0, 1, 0);
+                previewElements.healthbarFill.BackgroundColor3 = Color3.fromRGB(0, 255, 0);
+            end;
 
                 -- Health Text (to the right of healthbar)
                 previewElements.healthText.Visible = flags.Health_Text or false;
