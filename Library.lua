@@ -5013,33 +5013,7 @@ do
         -- ESP Elements for preview
         local previewElements = {};
 
-        -- DEBUG: Red test square at center
-        local testBox = Library:Create('Frame', {
-            Name = 'TestCenter',
-            Size = UDim2.fromOffset(50, 50),
-            Position = UDim2.fromOffset(125, 125), -- Center of 280x280
-            BackgroundColor3 = Color3.fromRGB(255, 0, 0),
-            BorderSizePixel = 0,
-            ZIndex = 10000,
-            Parent = ESPOverlay,
-        });
-        print('DEBUG: Test box created at 125,125');
-
-        -- DEBUG: Flag status text
-        local debugText = Library:Create('TextLabel', {
-            Name = 'DebugFlags',
-            Size = UDim2.new(1, 0, 0, 60),
-            Position = UDim2.new(0, 0, 0, 0),
-            BackgroundTransparency = 0.5,
-            BackgroundColor3 = Color3.fromRGB(0, 0, 0),
-            TextColor3 = Color3.fromRGB(255, 255, 0),
-            FontFace = Library.Font,
-            TextSize = 10,
-            TextXAlignment = Enum.TextXAlignment.Left,
-            TextYAlignment = Enum.TextYAlignment.Top,
-            ZIndex = 10001,
-            Parent = ESPOverlay,
-        });
+        -- DEBUG elements removed for testing
 
         -- Box
         previewElements.box = Library:Create('Frame', {
@@ -5151,14 +5125,6 @@ do
         -- Update ESP based on flags
         function Preview:UpdateESP(flags, playerName)
             if not self.Clone or not self.Clone.PrimaryPart then return end;
-
-            -- Update debug text with flag status
-            debugText.Text = string.format('B:%s N:%s HB:%s HT:%s D:%s', 
-                tostring(flags.Boxes), 
-                tostring(flags.Names), 
-                tostring(flags.Healthbar), 
-                tostring(flags.Health_Text), 
-                tostring(flags.Distance));
 
             -- Use FIXED positions for 280x280 preview (character is always in center)
             -- Box: 100x150 centered at (140, 140)
