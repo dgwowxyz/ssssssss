@@ -4991,11 +4991,315 @@ do
         });
         Viewport.CurrentCamera = Camera;
 
+        -- ESP Preview System
+        local ESPBox = Library:Create('Frame', {
+            BackgroundTransparency = 1,
+            Parent = Viewport,
+            Name = 'ESPBox',
+            BorderSizePixel = 0,
+            Size = UDim2.new(0, 100, 0, 100),
+            Position = UDim2.new(0, 0, 0, 0),
+            Visible = false,
+        });
+
+        -- Box outline (normal box)
+        local BoxOutline = Library:Create('UIStroke', {
+            Parent = ESPBox,
+            LineJoinMode = Enum.LineJoinMode.Miter,
+            Thickness = 1,
+            Color = Color3.fromRGB(0, 0, 0),
+        });
+
+        local BoxHandler = Library:Create('Frame', {
+            Parent = ESPBox,
+            BackgroundTransparency = 1,
+            BorderSizePixel = 0,
+            Position = UDim2.new(0, 1, 0, 1),
+            Size = UDim2.new(1, -2, 1, -2),
+        });
+
+        local BoxColor = Library:Create('UIStroke', {
+            Parent = BoxHandler,
+            LineJoinMode = Enum.LineJoinMode.Miter,
+            Thickness = 1,
+            Color = Color3.fromRGB(255, 255, 255),
+        });
+
+        -- Inner black border
+        Library:Create('UIStroke', {
+            Parent = Library:Create('Frame', {
+                Parent = BoxHandler,
+                BackgroundTransparency = 1,
+                BorderSizePixel = 0,
+                Position = UDim2.new(0, 1, 0, 1),
+                Size = UDim2.new(1, -2, 1, -2),
+            }),
+            LineJoinMode = Enum.LineJoinMode.Miter,
+            Thickness = 1,
+            Color = Color3.fromRGB(0, 0, 0),
+        });
+
+        -- Box fill
+        local BoxFill = Library:Create('Frame', {
+            Parent = BoxHandler,
+            BackgroundTransparency = 0.5,
+            BackgroundColor3 = Color3.fromRGB(255, 255, 255),
+            BorderSizePixel = 0,
+            Position = UDim2.new(0, 1, 0, 1),
+            Size = UDim2.new(1, -2, 1, -2),
+            Visible = false,
+        });
+
+        -- Name label
+        local NameLabel = Library:Create('TextLabel', {
+            Parent = ESPBox,
+            Font = Enum.Font.SourceSans,
+            Text = 'Player',
+            TextColor3 = Color3.fromRGB(255, 255, 255),
+            TextStrokeTransparency = 1,
+            TextSize = 9,
+            BackgroundTransparency = 1,
+            BorderSizePixel = 0,
+            AnchorPoint = Vector2.new(0.5, 1),
+            Size = UDim2.new(1, 0, 0, 0),
+            Position = UDim2.new(0.5, 0, 0, -2),
+            AutomaticSize = Enum.AutomaticSize.Y,
+            TextXAlignment = Enum.TextXAlignment.Center,
+            Visible = false,
+        });
+
+        local NameShadow = Library:Create('TextLabel', {
+            Parent = ESPBox,
+            Font = Enum.Font.SourceSans,
+            Text = 'Player',
+            TextColor3 = Color3.fromRGB(0, 0, 0),
+            TextStrokeTransparency = 1,
+            TextSize = 9,
+            BackgroundTransparency = 1,
+            BorderSizePixel = 0,
+            AnchorPoint = Vector2.new(0.5, 1),
+            Size = UDim2.new(1, 0, 0, 0),
+            Position = UDim2.new(0.5, 1, 0, -1),
+            AutomaticSize = Enum.AutomaticSize.Y,
+            TextXAlignment = Enum.TextXAlignment.Center,
+            Visible = false,
+            ZIndex = 0,
+        });
+
+        -- Healthbar
+        local HealthbarHolder = Library:Create('Frame', {
+            Parent = ESPBox,
+            AnchorPoint = Vector2.new(1, 0),
+            Position = UDim2.new(0, -2, 0, 0),
+            Size = UDim2.new(0, 3, 1, 0),
+            BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+            BorderSizePixel = 0,
+            Visible = false,
+        });
+
+        local Healthbar = Library:Create('Frame', {
+            Parent = HealthbarHolder,
+            Position = UDim2.new(0, 1, 0, 1),
+            Size = UDim2.new(1, -2, 1, -2),
+            BackgroundColor3 = Color3.fromRGB(0, 255, 0),
+            BorderSizePixel = 0,
+        });
+
+        local HealthbarCover = Library:Create('Frame', {
+            Parent = Healthbar,
+            Position = UDim2.new(0, 0, 0, 0),
+            Size = UDim2.new(1, 0, 0, 0),
+            BackgroundColor3 = Color3.fromRGB(0, 0, 0),
+            BorderSizePixel = 0,
+        });
+
+        -- Distance label
+        local DistanceLabel = Library:Create('TextLabel', {
+            Parent = ESPBox,
+            Font = Enum.Font.SourceSans,
+            Text = '0m',
+            TextColor3 = Color3.fromRGB(255, 255, 255),
+            TextStrokeTransparency = 1,
+            TextSize = 9,
+            BackgroundTransparency = 1,
+            BorderSizePixel = 0,
+            Size = UDim2.new(1, 0, 0, 0),
+            Position = UDim2.new(0, 0, 1, 1),
+            AutomaticSize = Enum.AutomaticSize.Y,
+            TextXAlignment = Enum.TextXAlignment.Center,
+            Visible = false,
+        });
+
+        local DistanceShadow = Library:Create('TextLabel', {
+            Parent = ESPBox,
+            Font = Enum.Font.SourceSans,
+            Text = '0m',
+            TextColor3 = Color3.fromRGB(0, 0, 0),
+            TextStrokeTransparency = 1,
+            TextSize = 9,
+            BackgroundTransparency = 1,
+            BorderSizePixel = 0,
+            Size = UDim2.new(1, 0, 0, 0),
+            Position = UDim2.new(0, 1, 1, 2),
+            AutomaticSize = Enum.AutomaticSize.Y,
+            TextXAlignment = Enum.TextXAlignment.Center,
+            Visible = false,
+            ZIndex = 0,
+        });
+
         Preview.Instance = PreviewFrame;
         Preview.Viewport = Viewport;
         Preview.WorldModel = WorldModel;
         Preview.Camera = Camera;
         Preview.Clone = nil;
+        Preview.ESP = {
+            Box = ESPBox,
+            BoxOutline = BoxOutline,
+            BoxColor = BoxColor,
+            BoxFill = BoxFill,
+            NameLabel = NameLabel,
+            NameShadow = NameShadow,
+            HealthbarHolder = HealthbarHolder,
+            Healthbar = Healthbar,
+            HealthbarCover = HealthbarCover,
+            DistanceLabel = DistanceLabel,
+            DistanceShadow = DistanceShadow,
+        };
+
+        -- Math function to solve 2D box from 3D model
+        function Preview:SolveBox()
+            if not self.Clone then return nil, nil end
+
+            local min = Vector2.new(math.huge, math.huge)
+            local max = Vector2.new(-math.huge, -math.huge)
+            local anyVisible = false
+
+            for _, obj in ipairs(self.Clone:GetDescendants()) do
+                if obj:IsA('BasePart') then
+                    local size = obj.Size
+                    local cframe = obj.CFrame
+
+                    local corners = {
+                        Vector3.new(0.5, 0.5, 0.5),
+                        Vector3.new(-0.5, 0.5, 0.5),
+                        Vector3.new(0.5, -0.5, 0.5),
+                        Vector3.new(-0.5, -0.5, 0.5),
+                        Vector3.new(0.5, 0.5, -0.5),
+                        Vector3.new(-0.5, 0.5, -0.5),
+                        Vector3.new(0.5, -0.5, -0.5),
+                        Vector3.new(-0.5, -0.5, -0.5),
+                    }
+
+                    for _, corner in ipairs(corners) do
+                        local worldPoint = cframe:PointToWorldSpace(Vector3.new(
+                            corner.X * size.X,
+                            corner.Y * size.Y,
+                            corner.Z * size.Z
+                        ))
+
+                        local viewportPoint, visible = Camera:WorldToViewportPoint(worldPoint)
+
+                        if visible then
+                            anyVisible = true
+                            min = Vector2.new(math.min(min.X, viewportPoint.X), math.min(min.Y, viewportPoint.Y))
+                            max = Vector2.new(math.max(max.X, viewportPoint.X), math.max(max.Y, viewportPoint.Y))
+                        end
+                    end
+                end
+            end
+
+            if not anyVisible then return nil, nil end
+
+            local viewAbsSize = Viewport.AbsoluteSize
+            local size2D = max - min
+            local pos2D = min
+
+            return pos2D, size2D
+        end
+
+        -- Update ESP elements visibility and position
+        function Preview:UpdateESP(flags)
+            if not self.Clone or not flags then
+                ESPBox.Visible = false
+                return
+            end
+
+            local pos, size = self:SolveBox()
+            if not pos or not size then
+                ESPBox.Visible = false
+                return
+            end
+
+            -- Update box position and size
+            ESPBox.Position = UDim2.new(0, pos.X, 0, pos.Y)
+            ESPBox.Size = UDim2.new(0, size.X, 0, size.Y)
+            ESPBox.Visible = flags.Enabled and flags.Boxes
+
+            -- Update colors
+            if flags.Box_Color then
+                BoxColor.Color = flags.Box_Color.Color
+            end
+            if flags.Box_Fill_Color then
+                BoxFill.BackgroundColor3 = flags.Box_Fill_Color.Color
+            end
+            if flags.Name_Color then
+                NameLabel.TextColor3 = flags.Name_Color.Color
+            end
+            if flags.Distance_Color then
+                DistanceLabel.TextColor3 = flags.Distance_Color.Color
+            end
+            if flags.Health_High and flags.Health_Low then
+                -- Health color will be set based on health percentage
+            end
+
+            -- Box fill
+            BoxFill.Visible = flags.Boxes and flags.Box_Fill
+            BoxFill.BackgroundTransparency = flags.Box_Fill_Transparency or 0.5
+
+            -- Name
+            NameLabel.Visible = flags.Names
+            NameShadow.Visible = flags.Names and flags.Name_Outline
+            if flags.Name_Size then
+                NameLabel.TextSize = flags.Name_Size
+                NameShadow.TextSize = flags.Name_Size
+            end
+
+            -- Distance
+            DistanceLabel.Visible = flags.Distance
+            DistanceShadow.Visible = flags.Distance and flags.Distance_Outline
+            if flags.Distance_Size then
+                DistanceLabel.TextSize = flags.Distance_Size
+                DistanceShadow.TextSize = flags.Distance_Size
+            end
+
+            -- Healthbar
+            HealthbarHolder.Visible = flags.Healthbar
+            if flags.Healthbar_Thickness then
+                HealthbarHolder.Size = UDim2.new(0, flags.Healthbar_Thickness + 2, 1, 0)
+            end
+            if flags.Healthbar_Position then
+                if flags.Healthbar_Position == 'Right' then
+                    HealthbarHolder.AnchorPoint = Vector2.new(0, 0)
+                    HealthbarHolder.Position = UDim2.new(1, 2, 0, 0)
+                else
+                    HealthbarHolder.AnchorPoint = Vector2.new(1, 0)
+                    HealthbarHolder.Position = UDim2.new(0, -2, 0, 0)
+                end
+            end
+
+            -- Update health percentage if humanoid exists
+            local humanoid = self.Clone:FindFirstChildOfClass('Humanoid')
+            if humanoid and flags.Healthbar then
+                local healthPercent = math.clamp(humanoid.Health / humanoid.MaxHealth, 0, 1)
+                HealthbarCover.Size = UDim2.new(1, 0, 1 - healthPercent, 0)
+                HealthbarCover.Position = UDim2.new(0, 0, 0, 0)
+
+                -- Color based on health
+                if flags.Health_High and flags.Health_Low then
+                    Healthbar.BackgroundColor3 = flags.Health_Low.Color:Lerp(flags.Health_High.Color, healthPercent)
+                end
+            end
+        end
 
         function Preview:UpdateCharacter(char)
             if self.Clone then
